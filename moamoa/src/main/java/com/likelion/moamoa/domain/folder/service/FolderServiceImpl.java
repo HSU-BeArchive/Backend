@@ -7,8 +7,12 @@ import com.likelion.moamoa.domain.folder.exception.UserNotFoundException;
 import com.likelion.moamoa.domain.folder.repository.FolderRepository;
 import com.likelion.moamoa.domain.folder.web.dto.CreateFolderReq;
 import com.likelion.moamoa.domain.folder.web.dto.CreateFolderRes;
+import com.likelion.moamoa.domain.folder.web.dto.FolderSummeryRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +42,24 @@ public class FolderServiceImpl implements FolderService {
         );
     }
 
+    @Override
+    @Transactional
+    public FolderSummeryRes getAllByFolder(Long userId) {
+        // 1. userId -> User Entity 찾기
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+        // 2. Folder Entity DB 조회
+        return new FolderSummeryRes(
+                folderRepository.findAllByUser_UserId(userId).stream()
+                        .map(folder -> new FolderSummeryRes.FolderSummery(
+                                folder.getFolderId(),
+                                folder.getFolderName(),
+                                folder.getFolderColor(),
+                                folder.getFolderOrder()
+                        ))
+                        .collect(Collectors.toList())
+        );
+    }
 
 
 }

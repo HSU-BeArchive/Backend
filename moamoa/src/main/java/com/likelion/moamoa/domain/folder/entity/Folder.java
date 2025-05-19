@@ -23,4 +23,6 @@ public class Folder {
     @ManyToOne
     @JoinColumn(name = "USER_ID")
     private User user;
+    // 폴더 순서(드래그 기능 구현시 사용)
+    private Long folderOrder;
 }
