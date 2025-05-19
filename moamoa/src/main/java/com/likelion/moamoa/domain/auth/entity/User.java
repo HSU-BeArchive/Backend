@@ -22,4 +22,5 @@ public class User {
     private String loginId;
     @Column(name = "PASSWORD")
     private String password;
+
 }
