@@ -3,7 +3,8 @@ package com.likelion.moamoa.domain.folder.service;
 import com.likelion.moamoa.domain.auth.entity.User;
 import com.likelion.moamoa.domain.auth.repository.UserRepository;
 import com.likelion.moamoa.domain.folder.entity.Folder;
-import com.likelion.moamoa.domain.folder.exception.UserNotFoundException;
+import com.likelion.moamoa.domain.folder.exception.NotFoundFolderException;
+import com.likelion.moamoa.domain.folder.exception.NotFoundUserException;
 import com.likelion.moamoa.domain.folder.repository.FolderRepository;
 import com.likelion.moamoa.domain.folder.web.dto.CreateFolderReq;
 import com.likelion.moamoa.domain.folder.web.dto.CreateFolderRes;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,12 +27,11 @@ public class FolderServiceImpl implements FolderService {
     public CreateFolderRes createFolder(Long userId, CreateFolderReq createFolderReq) {
         // 0. userId -> User Entity 찾기
         User user = userRepository.findById(userId)
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(NotFoundUserException::new);
 
         // 1. createFolderReq -> Folder Entity 생성
         Folder folder = Folder.builder()
                 .folderName(createFolderReq.getFolderName())
-                .folderColor(createFolderReq.getFolderColor())
                 .folderOrder(folderRepository.count()) // 0번부터 시작
                 .user(user)
                 .build();
@@ -43,7 +44,6 @@ public class FolderServiceImpl implements FolderService {
                 saveFolder.getUser().getUserId(),
                 saveFolder.getFolderId(),
                 saveFolder.getFolderName(),
-                saveFolder.getFolderColor(),
                 saveFolder.getFolderOrder()
         );
     }
@@ -53,19 +53,36 @@ public class FolderServiceImpl implements FolderService {
     public FolderSummeryRes getAllByFolder(Long userId) {
         // 1. userId -> User Entity 찾기
         User user = userRepository.findById(userId)
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(NotFoundUserException::new);
         // 2. Folder Entity DB 조회
         return new FolderSummeryRes(
                 folderRepository.findAllByUser_UserId(userId).stream()
                         .map(folder -> new FolderSummeryRes.FolderSummery(
                                 folder.getFolderId(),
                                 folder.getFolderName(),
-                                folder.getFolderColor(),
                                 folder.getFolderOrder()
                         ))
                         .collect(Collectors.toList())
         );
     }
 
+    // 폴더 삭제
+    @Override
+    public void deleteOneFolder(Long userId, Long folderid) {
+        Folder folder = folderRepository.findById(folderid)
+                .orElseThrow(NotFoundFolderException::new);
+
+        if (!folder.getUser().getUserId().equals(userId)) {
+            throw new NotFoundUserException();
+        }
+
+        // 폴더 삭제하면 모두 앞당기기
+        long orderValue = folder.getFolderOrder();
+        folderRepository.findAllByUser_UserId(userId).stream()
+                .filter(f -> f.getFolderOrder() > orderValue)
+                .forEach(f -> f.setFolderOrder(f.getFolderOrder() - 1));
+
+        folderRepository.delete(folder);
+    }
 
 }

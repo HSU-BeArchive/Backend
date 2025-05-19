@@ -19,9 +19,6 @@ public class Folder {
     @Column(name = "FOLDER_NAME")
     private String folderName;
 
-    @Column(name = "FOLDER_COLOR")
-    private String folderColor;
-
     // 폴더 순서(드래그 기능 구현시 사용)
     @Column(name = "FOLDER_ORDER")
     private Long folderOrder;
