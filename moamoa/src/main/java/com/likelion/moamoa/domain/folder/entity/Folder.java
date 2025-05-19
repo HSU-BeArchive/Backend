@@ -15,14 +15,18 @@ public class Folder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "FOLDER_ID")
     private Long folderId;
+
     @Column(name = "FOLDER_NAME")
     private String folderName;
+
     @Column(name = "FOLDER_COLOR")
     private String folderColor;
 
-    @ManyToOne
-    @JoinColumn(name = "USER_ID")
-    private User user;
     // 폴더 순서(드래그 기능 구현시 사용)
+    @Column(name = "FOLDER_ORDER")
     private Long folderOrder;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_ID", nullable = false)
+    private User user;
 }
