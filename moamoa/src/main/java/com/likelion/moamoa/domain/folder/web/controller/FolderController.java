@@ -3,9 +3,11 @@ package com.likelion.moamoa.domain.folder.web.controller;
 import com.likelion.moamoa.domain.folder.service.FolderService;
 import com.likelion.moamoa.domain.folder.web.dto.CreateFolderReq;
 import com.likelion.moamoa.domain.folder.web.dto.CreateFolderRes;
+import com.likelion.moamoa.domain.folder.web.dto.FolderSummeryRes;
 import com.likelion.moamoa.global.response.SuccessResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,5 +26,14 @@ public class FolderController {
 
 
         return ResponseEntity.ok(SuccessResponse.created(createFolderRes));
+    }
+
+    @GetMapping
+    public ResponseEntity<SuccessResponse<?>> getAllByFolder(@PathVariable Long userId) {
+        FolderSummeryRes folderSummeryRes = folderService.getAllByFolder(userId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(SuccessResponse.ok(folderSummeryRes));
     }
 }
