@@ -20,14 +20,17 @@ public class FolderController {
 
     // 폴더 생성
     @PostMapping
-    public ResponseEntity<SuccessResponse<?>> CreateFolder(@PathVariable Long userId, @RequestBody @Valid CreateFolderReq createFolderReq) {
+    public ResponseEntity<SuccessResponse<?>> CreateFolder(
+            @PathVariable Long userId,
+            @RequestBody @Valid CreateFolderReq createFolderReq
+    ) {
 
-        CreateFolderRes createFolderRes = folderService.createFolder(userId,createFolderReq);
-
+        CreateFolderRes createFolderRes = folderService.createFolder(userId, createFolderReq);
 
         return ResponseEntity.ok(SuccessResponse.created(createFolderRes));
     }
 
+    // 폴더 전체 조회
     @GetMapping
     public ResponseEntity<SuccessResponse<?>> getAllByFolder(@PathVariable Long userId) {
         FolderSummeryRes folderSummeryRes = folderService.getAllByFolder(userId);

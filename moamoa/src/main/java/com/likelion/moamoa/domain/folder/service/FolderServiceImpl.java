@@ -19,26 +19,32 @@ import java.util.stream.Collectors;
 public class FolderServiceImpl implements FolderService {
     private final FolderRepository folderRepository;
     private final UserRepository userRepository;
+
     // 폴더 생성
     @Override
     public CreateFolderRes createFolder(Long userId, CreateFolderReq createFolderReq) {
         // 0. userId -> User Entity 찾기
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
+
         // 1. createFolderReq -> Folder Entity 생성
         Folder folder = Folder.builder()
                 .folderName(createFolderReq.getFolderName())
                 .folderColor(createFolderReq.getFolderColor())
+                .folderOrder(folderRepository.count()) // 0번부터 시작
                 .user(user)
                 .build();
+
         // 2. Folder Entity DB 저장
         Folder saveFolder = folderRepository.save(folder);
+
         // 3. Folder Entity -> CreateFolderRes로 변환
         return new CreateFolderRes(
+                saveFolder.getUser().getUserId(),
                 saveFolder.getFolderId(),
                 saveFolder.getFolderName(),
                 saveFolder.getFolderColor(),
-                saveFolder.getUser().getUserId()
+                saveFolder.getFolderOrder()
         );
     }
 
