@@ -1,8 +1,12 @@
 package com.likelion.moamoa.domain.auth.entity;
 
 
+import com.likelion.moamoa.domain.folder.entity.Folder;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -21,5 +25,8 @@ public class User {
     private String loginId;
     @Column(name = "PASSWORD")
     private String password;
+
+//    @OneToMany(mappedBy = "user")
+//    private List<Folder> folders = new ArrayList<>();
 
 }
