@@ -6,7 +6,6 @@ public record FolderSummeryRes(List<FolderSummery> folderSummeryList) {
     public record FolderSummery(
             Long folderId,
             String folderName,
-            String folderColor,
             Long folderOrder
     ){
 

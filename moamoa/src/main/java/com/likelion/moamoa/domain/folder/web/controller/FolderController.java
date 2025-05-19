@@ -39,4 +39,17 @@ public class FolderController {
                 .status(HttpStatus.OK)
                 .body(SuccessResponse.ok(folderSummeryRes));
     }
+
+    // 폴더 삭제
+    @DeleteMapping("/{folderId}")
+    public ResponseEntity<SuccessResponse<?>> deleteOneFolder(
+            @PathVariable Long userId,
+            @PathVariable Long folderId
+    ) {
+        folderService.deleteOneFolder(userId, folderId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(SuccessResponse.empty());
+    }
 }
