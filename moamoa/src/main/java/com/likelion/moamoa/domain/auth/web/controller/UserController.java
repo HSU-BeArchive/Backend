@@ -1,6 +1,8 @@
 package com.likelion.moamoa.domain.auth.web.controller;
 
 import com.likelion.moamoa.domain.auth.service.UserService;
+import com.likelion.moamoa.domain.auth.web.dto.SigninUserReq;
+import com.likelion.moamoa.domain.auth.web.dto.SigninUserRes;
 import com.likelion.moamoa.domain.auth.web.dto.SignupUserReq;
 import com.likelion.moamoa.domain.auth.web.dto.SignupUserRes;
 import com.likelion.moamoa.global.response.SuccessResponse;
@@ -36,11 +38,18 @@ public class UserController {
     }
 
     // 회원 로그인
-//    @PostMapping("/signin")
-//    public ResponseEntity<SuccessResponse<?>> signin(@RequestBody @Valid SignupUserReq signupUserReq) {
-//        userService.signin(signinUserReq);
-//        return ResponseEntity.ok(SuccessResponse.ok(null));
-//    }
+    @PostMapping("/signin")
+    public ResponseEntity<SuccessResponse<?>> signin(
+            @RequestBody @Valid
+            SigninUserReq signinUserReq
+    ) {
+        // 서비스
+        SigninUserRes signinUserRes = userService.singin(signinUserReq);
 
+        // 반환
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(SuccessResponse.ok(signinUserRes));
+    }
 
 }
