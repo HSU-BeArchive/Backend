@@ -4,7 +4,6 @@ public record CreateFolderRes(
         Long userId,
         Long folderId,
         String folderName,
-        String folderColor,
         Long folderOrder
 ) {
 }

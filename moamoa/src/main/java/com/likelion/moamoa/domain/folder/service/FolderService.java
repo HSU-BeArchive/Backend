@@ -10,4 +10,7 @@ public interface FolderService {
 
     // 폴더 전체 조회
     FolderSummeryRes getAllByFolder(Long userId);
+
+    // 폴더 삭제
+    void deleteOneFolder(Long userId, Long folderid);
 }
