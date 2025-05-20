@@ -1,0 +1,33 @@
+package com.likelion.moamoa.domain.reference.entity;
+
+import com.likelion.moamoa.domain.auth.entity.User;
+import com.likelion.moamoa.domain.folder.entity.Folder;
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@Builder
+@AllArgsConstructor
+public class Reference {
+
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "REFERENCE_ID")
+    private Long id;
+
+    @Column(name = "NAME")
+    private String name;
+
+    @Column(name = "DESCRIPTION")
+    private String description;
+
+    @Column(name = "IMG_URL")
+    private String imgUrl;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FOLDER_ID", nullable = false)
+    private Folder folder;
+
+}
