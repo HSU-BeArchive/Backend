@@ -5,6 +5,6 @@ import com.likelion.moamoa.global.exception.BaseException;
 
 public class NotFoundUserException extends BaseException {
     public NotFoundUserException() {
-        super(FolderErrorCode.FOLDER_USER_NOT_FOUND_404);
+        super(FolderErrorCode.FOLDER_NOT_FOUND_USER_404);
     }
 }
