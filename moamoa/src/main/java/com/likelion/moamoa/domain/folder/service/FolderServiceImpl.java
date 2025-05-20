@@ -3,9 +3,9 @@ package com.likelion.moamoa.domain.folder.service;
 import com.likelion.moamoa.domain.auth.entity.User;
 import com.likelion.moamoa.domain.auth.repository.UserRepository;
 import com.likelion.moamoa.domain.folder.entity.Folder;
+import com.likelion.moamoa.domain.folder.exception.DuplicateFolderNameException;
 import com.likelion.moamoa.domain.folder.exception.NotFoundFolderException;
 import com.likelion.moamoa.domain.folder.exception.NotFoundUserException;
-import com.likelion.moamoa.domain.folder.exception.DulicateFolderNameException;
 import com.likelion.moamoa.domain.folder.repository.FolderRepository;
 import com.likelion.moamoa.domain.folder.web.dto.CreateFolderReq;
 import com.likelion.moamoa.domain.folder.web.dto.CreateFolderRes;
@@ -13,8 +13,6 @@ import com.likelion.moamoa.domain.folder.web.dto.FolderSummeryRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,7 +31,7 @@ public class FolderServiceImpl implements FolderService {
         // 1. createFolderReq -> Folder Entity 생성
         // 폴더 중복 예외
         if(folderRepository.existsByFolderNameAndUser_UserId(createFolderReq.getFolderName(), userId)) {
-            throw new DulicateFolderNameException();
+            throw new DuplicateFolderNameException();
         }
         Folder folder = Folder.builder()
                 .folderName(createFolderReq.getFolderName())
