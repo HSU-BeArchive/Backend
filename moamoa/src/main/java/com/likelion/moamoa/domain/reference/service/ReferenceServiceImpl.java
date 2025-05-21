@@ -51,7 +51,7 @@ public class ReferenceServiceImpl implements ReferenceService {
 
         return new SaveReferenceRes(
                 saveReference.getFolder().getFolderId(),
-                saveReference.getId(),
+                saveReference.getReferenceId(),
                 saveReference.getName(),
                 saveReference.getDescription(),
                 saveReference.getImgUrl()
