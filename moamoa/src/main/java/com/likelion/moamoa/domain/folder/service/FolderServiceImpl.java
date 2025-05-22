@@ -51,6 +51,7 @@ public class FolderServiceImpl implements FolderService {
         );
     }
 
+    // 폴더 전체 조회
     @Override
     @Transactional
     public FolderSummeryRes getAllByFolder(Long userId) {

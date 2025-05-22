@@ -1,6 +1,5 @@
 package com.likelion.moamoa.domain.auth.service;
 
-
 import com.likelion.moamoa.domain.auth.entity.User;
 import com.likelion.moamoa.domain.auth.exception.DuplicateLoginIdException;
 import com.likelion.moamoa.domain.auth.exception.InvalidPasswordException;
@@ -13,10 +12,10 @@ import com.likelion.moamoa.domain.auth.web.dto.SignupUserRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
     private final UserRepository userRepository;
 
     // 회원 가입
@@ -34,18 +33,19 @@ public class UserServiceImpl implements UserService {
                 .password(signupUserReq.getPassword())
                 .build();
 
-        // repository User 저장 (userRepository 사용)
-        User savedUser = userRepository.save(user);
+        // User 저장
+        User saveUser = userRepository.save(user);
 
         // 반환
-        return new SignupUserRes(savedUser.getUserId());
+        return new SignupUserRes(saveUser.getUserId());
     }
 
+    // 로그인
     @Override
     public SigninUserRes singin(SigninUserReq signinUserReq) {
         // 아이디 존재 여부 검사
         User user = userRepository.findByLoginId(signinUserReq.getLoginId())
-                // 존재 하지 않으면 404 예외
+                // 존재 X
                 .orElseThrow(NotFoundLoginIdException::new);
 
         // 비밀번호 확인 검사
@@ -54,9 +54,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // 반환
-        return new SigninUserRes(
-                user.getLoginId()
-        );
+        return new SigninUserRes(user.getLoginId());
     }
 
 }
