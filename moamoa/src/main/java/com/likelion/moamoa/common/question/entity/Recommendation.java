@@ -4,11 +4,13 @@ import com.likelion.moamoa.domain.reference.entity.Reference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 public class Recommendation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
