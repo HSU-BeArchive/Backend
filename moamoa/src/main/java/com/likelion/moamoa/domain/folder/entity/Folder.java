@@ -11,8 +11,7 @@ import com.likelion.moamoa.domain.auth.entity.User;
 @AllArgsConstructor
 public class Folder {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "FOLDER_ID")
     private Long folderId;
 
