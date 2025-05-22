@@ -25,8 +25,7 @@ public class UserController {
     // 회원 가입
     @PostMapping("/signup")
     public ResponseEntity<SuccessResponse<?>> signup(
-            @RequestBody @Valid
-            SignupUserReq signupUserReq
+            @RequestBody @Valid SignupUserReq signupUserReq
     ) {
         // 서비스
         SignupUserRes signupUserRes = userService.signup(signupUserReq);
@@ -40,8 +39,7 @@ public class UserController {
     // 회원 로그인
     @PostMapping("/signin")
     public ResponseEntity<SuccessResponse<?>> signin(
-            @RequestBody @Valid
-            SigninUserReq signinUserReq
+            @RequestBody @Valid SigninUserReq signinUserReq
     ) {
         // 서비스
         SigninUserRes signinUserRes = userService.singin(signinUserReq);
