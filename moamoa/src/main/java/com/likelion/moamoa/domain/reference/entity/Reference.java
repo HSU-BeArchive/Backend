@@ -15,7 +15,7 @@ public class Reference {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "REFERENCE_ID")
-    private Long id;
+    private Long referenceId;
 
     @Column(name = "NAME")
     private String name;

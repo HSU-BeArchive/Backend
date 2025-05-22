@@ -7,6 +7,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import com.amazonaws.regions.Regions;
 
 @Configuration
 public class S3Config {
@@ -21,7 +22,8 @@ public class S3Config {
     public AmazonS3Client amazonS3Client() {
         BasicAWSCredentials awsCredentials= new BasicAWSCredentials(accessKey, secretKey);
         return (AmazonS3Client) AmazonS3ClientBuilder.standard()
-                .withRegion(region)
+               .withRegion(Regions.AP_NORTHEAST_2)
+//              .withRegion(region)
                 .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
                 .build();
     }
