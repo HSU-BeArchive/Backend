@@ -9,6 +9,7 @@ import lombok.Getter;
 public enum ReferenceErrorCode implements BaseResponseCode {
     REFERENCE_DUPLICATE_NAME_409("REFERENCE_DUPLICATE_NAME_409", 409, "이미 존재하는 파일명입니다.");
 
+
     private final String code;
     private final int httpStatus;
     private final String message;
