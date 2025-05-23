@@ -10,6 +10,6 @@ public interface ChatService {
     ChatMessageRes sendMessage(ChatMessageReq chatMessageReq);
 
     // 메서드 시그니처는 동일
-    List<ChatMessageRes> getChatHistory(String sessionId);
+    List<ChatMessageRes> getChatHistory(Long recommendationId);
 
 }

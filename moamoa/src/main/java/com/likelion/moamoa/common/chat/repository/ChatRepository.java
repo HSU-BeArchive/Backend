@@ -1,11 +1,12 @@
 package com.likelion.moamoa.common.chat.repository;
 
 import com.likelion.moamoa.common.chat.entitiy.Chat;
+import com.likelion.moamoa.common.question.entity.Recommendation;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
 public interface ChatRepository extends JpaRepository<Chat, Long> {
 
-    List<Chat> findBySessionUuidOrderByCreatedAtAsc(String sessionUuid);
+    List<Chat> findByRecommendationRecommendationIdOrderByCreatedAtAsc(Long recommendationId);
 }

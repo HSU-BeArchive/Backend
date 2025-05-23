@@ -9,7 +9,8 @@ import java.time.LocalDateTime;
 @Builder
 public record ChatMessageRes(
         Long chatId,
-        String sessionId,
+//        String sessionId,
+        Long recommendationId,
         String message,
         MessageRole messageRole,
         LocalDateTime createdAt
