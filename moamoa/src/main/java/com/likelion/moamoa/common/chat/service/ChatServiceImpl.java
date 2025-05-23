@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -45,10 +46,7 @@ public class ChatServiceImpl implements ChatService{
                 Recommendation recommendation = recommendationRepository.findById(chatMessageReq.getRecommendationId())
                         .orElseThrow(NotFoundRecommendationException::new);
 
-                // 추천 질문 소유자 검증
-                if (recommendation.getUser() == null || !recommendation.getUser().getUserId().equals(user.getUserId())) {
-                        throw new ForbiddenRecommendationException();
-        }
+
 
                 // 세션 UUID 결정
                 String sessionId = chatMessageReq.getSessionId();
@@ -66,7 +64,6 @@ public class ChatServiceImpl implements ChatService{
                 chatRepository.save(userLog);
 
                 // 이전 대화 내용 가져오기
-                // findBySessionIdOrderByCreatedAtAsc(sessionId()) -> findBySessionUuidOrderByCreatedAtAsc(sessionId)
                 List<Chat> previousLogs = chatRepository.findBySessionUuidOrderByCreatedAtAsc(sessionId);
 
                 // OpenAI API에 전송할 메시지 형식으로 변환
@@ -120,7 +117,9 @@ public class ChatServiceImpl implements ChatService{
                         .build();
             }
 
-            // OpenAI API 호출 로직 구현
+
+
+    // OpenAI API 호출 로직 구현
             private String getResponseFromOpenAI(List<Map<String, String>> messages) {
                 Map<String, Object> body = new HashMap<>();
                 body.put("model", openAiConfig.getModel());
@@ -162,7 +161,22 @@ public class ChatServiceImpl implements ChatService{
                     throw new RuntimeException("GPT-4 API 호출 실패: " + e.getMessage());
                 }
             }
-        }
+    @Override
+    public List<ChatMessageRes> getChatHistory(String sessionId) {
+        List<Chat> chatLogs = chatRepository.findBySessionUuidOrderByCreatedAtAsc(sessionId);
+
+        return chatLogs.stream()
+                .map(chat -> ChatMessageRes.builder()
+                        .chatId(chat.getChatId())
+                        .sessionId(chat.getSessionUuid())
+                        .message(chat.getContent())
+                        .messageRole(chat.getMessageRole())
+                        .createdAt(chat.getCreatedAt())
+                        .build())
+                .collect(Collectors.toList());
+    }
+}
+
 
 
 
