@@ -6,11 +6,16 @@ import com.likelion.moamoa.domain.folder.repository.FolderRepository;
 import com.likelion.moamoa.domain.reference.entity.Reference;
 import com.likelion.moamoa.domain.reference.exception.DuplicateImgNameException;
 import com.likelion.moamoa.domain.reference.repository.ReferenceRepository;
+import com.likelion.moamoa.domain.reference.web.dto.ReferenceSummaryRes;
+import com.likelion.moamoa.domain.reference.web.dto.ReferenceSummaryRes.ReferenceSummary;
 import com.likelion.moamoa.domain.reference.web.dto.SaveReferenceReq;
 import com.likelion.moamoa.domain.reference.web.dto.SaveReferenceRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ModelAttribute;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +50,7 @@ public class ReferenceServiceImpl implements ReferenceService {
                 .name(saveReferenceReq.getName())
                 .description(saveReferenceReq.getDescription())
                 .imgUrl(url)
+                .referenceOrder(referenceRepository.count()) // 0번부터 시작
                 .build();
 
         Reference saveReference = referenceRepository.save(reference);
@@ -54,7 +60,30 @@ public class ReferenceServiceImpl implements ReferenceService {
                 saveReference.getReferenceId(),
                 saveReference.getName(),
                 saveReference.getDescription(),
-                saveReference.getImgUrl()
+                saveReference.getImgUrl(),
+                saveReference.getReferenceOrder()
         );
+    }
+
+    // 래퍼런스 전체 조회
+    @Override
+    public ReferenceSummaryRes getAllReference(Long folderId) {
+        // folerId -> folder 확인
+        Folder folder = folderRepository.findById(folderId)
+                .orElseThrow(NotFoundFolderException::new);
+
+        List<Reference> references = referenceRepository.findAll();
+        List<ReferenceSummary> referenceSummaryList = new ArrayList<>();
+
+        for (Reference reference : references) {
+            ReferenceSummary referenceSummary = new ReferenceSummary(
+                    reference.getReferenceId(),
+                    reference.getReferenceOrder(),
+                    reference.getImgUrl()
+            );
+            referenceSummaryList.add(referenceSummary);
+        }
+
+        return new ReferenceSummaryRes(referenceSummaryList);
     }
 }
