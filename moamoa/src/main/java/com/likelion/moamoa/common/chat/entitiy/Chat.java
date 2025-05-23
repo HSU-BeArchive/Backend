@@ -17,7 +17,7 @@ public class Chat extends BaseEntity {
     @Column(name = "CHAT_ID")
     private Long chatId;
 
-    @Column(columnDefinition = "TEXT", nullable = false) // TEXT 타입으로 변경
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
     private String sessionUuid;

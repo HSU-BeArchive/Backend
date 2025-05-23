@@ -3,7 +3,6 @@ package com.likelion.moamoa.common.chat.service;
 
 import com.likelion.moamoa.common.chat.entitiy.Chat;
 import com.likelion.moamoa.common.chat.entitiy.MessageRole;
-import com.likelion.moamoa.common.chat.exception.ForbiddenRecommendationException;
 import com.likelion.moamoa.common.chat.exception.NotFoundRecommendationException;
 import com.likelion.moamoa.common.chat.repository.ChatRepository;
 import com.likelion.moamoa.common.chat.web.dto.ChatMessageReq;
@@ -35,10 +34,10 @@ public class ChatServiceImpl implements ChatService{
     private final ChatRepository chatRepository;
     private final OpenAiConfig openAiConfig; // OpenAiConfig 주입
     private final RestTemplate restTemplate; // RestTemplate 주입
-
+    // 메시지 전송 메서드
     @Override
     public ChatMessageRes sendMessage(ChatMessageReq chatMessageReq) {
-                // 사용자 검증
+                // 사용자 검증 (findById는 기본키를 검증)
                 User user = userRepository.findById(chatMessageReq.getUserId())
                         .orElseThrow(NotFoundLoginIdException::new);
 
@@ -47,11 +46,11 @@ public class ChatServiceImpl implements ChatService{
                         .orElseThrow(NotFoundRecommendationException::new);
 
 
-
-                // 세션 UUID 결정
-                String sessionId = chatMessageReq.getSessionId();
-                if (sessionId == null || sessionId.isEmpty()) {
-                    sessionId = UUID.randomUUID().toString();
+                // 세션 관리
+                // 새로운 대화는 Id 생성 기존 대화는 이전 기존 대화의 Id 사용
+                String sessionId = chatMessageReq.getSessionId(); // chatMessageReq 객체에서 sessionId를 가져옴
+                if (sessionId == null || sessionId.isEmpty()) { // sessionId가 없는 지 확인
+                    sessionId = UUID.randomUUID().toString(); // 비어있다면 새로운 세션 Id 생성 (UUID = 전 세계적으로 유일성이 보장되는 식별자)
                 }
 
                 // 사용자 메시지 저장
@@ -63,14 +62,16 @@ public class ChatServiceImpl implements ChatService{
                         .build();
                 chatRepository.save(userLog);
 
-                // 이전 대화 내용 가져오기
+                // 이전 대화 내용 가져오기(챗봇이 전의 대화를 이해할 수 있도록)
                 List<Chat> previousLogs = chatRepository.findBySessionUuidOrderByCreatedAtAsc(sessionId);
 
                 // OpenAI API에 전송할 메시지 형식으로 변환
+                // role과 content를 키-값 쌍으로 가짐
                 List<Map<String, String>> messages = new ArrayList<>();
 
                 // 시스템 메시지: 추천 질문을 기반으로 브레인스토밍을 돕도록 설정
-        messages.add(Map.of("role", "system",
+                // system은 챗봇에게 특정 역할과 행동 지침을 부여함, 우리가 원하는 방식으로 응답하도록 프롬포팅 하는 것
+                messages.add(Map.of("role", "system",
                 "content", "당신은 사용자의 창의적인 브레인스토밍을 적극적으로 돕는 AI 챗봇입니다. " +
                         "사용자의 질문과 아이디어에 대해 단순히 정보를 제공하는 것을 넘어, " +
                         "다양한 관점을 제시하고, 새로운 아이디어를 제안하며, " +
@@ -84,10 +85,11 @@ public class ChatServiceImpl implements ChatService{
                         recommendation.getQuestion()));
 
                 // 이전 대화 내용 추가 (최근 10개 메시지)
-                int startIndex = Math.max(0, previousLogs.size() - 10);
+                int startIndex = Math.max(0, previousLogs.size() - 10); // previousLogs에 저장 되어 있는 채팅 중 최근 10개 메시지부터 시작
                 for (int i = startIndex; i < previousLogs.size(); i++) {
                     Chat log = previousLogs.get(i);
-                    String role = log.getMessageRole() == MessageRole.USER ? "user" : "assistant";
+                    // 발신자(AI, USER) 확인
+                    String role = log.getMessageRole() == MessageRole.USER ? "user" :"assistant";
                     messages.add(Map.of("role", role, "content", log.getContent()));
                 }
 
@@ -101,7 +103,7 @@ public class ChatServiceImpl implements ChatService{
                 // 봇 응답 저장
                 Chat botLog = Chat.builder()
                         .recommendation(recommendation)
-                        .sessionUuid(sessionId) // sessionUuid 필드명 사용
+                        .sessionUuid(sessionId)
                         .content(botResponse)
                         .messageRole(MessageRole.AI)
                         .build();
@@ -110,33 +112,35 @@ public class ChatServiceImpl implements ChatService{
                 // 응답 반환
                 return ChatMessageRes.builder()
                         .chatId(savedBotLog.getChatId())
-                        .sessionId(savedBotLog.getSessionUuid()) // sessionId -> sessionUuid
-                        .message(savedBotLog.getContent())      // message -> content
-                        .messageRole(savedBotLog.getMessageRole())     // messageRole -> role
+                        .sessionId(savedBotLog.getSessionUuid())
+                        .message(savedBotLog.getContent())
+                        .messageRole(savedBotLog.getMessageRole())
                         .createdAt(savedBotLog.getCreatedAt())
                         .build();
             }
 
 
 
-    // OpenAI API 호출 로직 구현
+            // OpenAI API 호출 로직 구현
             private String getResponseFromOpenAI(List<Map<String, String>> messages) {
+                // 1. 요청 본문(body) 만들기
                 Map<String, Object> body = new HashMap<>();
-                body.put("model", openAiConfig.getModel());
-                body.put("messages", messages);
+                body.put("model", openAiConfig.getModel()); // 사용할 AI 모델 지정
+                body.put("messages", messages); //챗봇과 주고 받은 대화 내용
                 body.put("temperature", 0.7); // 창의성 조절 (0.0 - 2.0, 기본값 1.0)
-                body.put("max_tokens", 100); // 최대 응답 길이 제한
+                body.put("max_tokens", 200); // 최대 응답 길이 제한
 
+                // 3. Http 헤더 준비
                 HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_JSON);
-                headers.setBearerAuth(openAiConfig.getApiKey());
+                headers.setContentType(MediaType.APPLICATION_JSON); // 요청 본문 json
+                headers.setBearerAuth(openAiConfig.getApiKey()); // api 키 설정
 
                 HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
                 try {
-                    // OpenAI Chat Completions API 엔드포인트: /v1/chat/completions
+                    // 4. GPT-4 API 호출
                     ResponseEntity<Map> response = restTemplate.postForEntity(
-                            openAiConfig.getApiUrl() + "/chat/completions", // URL 수정
+                            openAiConfig.getApiUrl() + "/chat/completions", // api 엔드포인트 url
                             request,
                             Map.class
                     );
