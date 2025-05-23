@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface RecommendationRepository extends JpaRepository<Recommendation,Long> {
     // 레퍼런스가 있는지 없는지 확인
     boolean existsByReference_ReferenceId(Long referenceId);
+
 }

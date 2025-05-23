@@ -12,4 +12,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // User라는 객체가 존재하면 값을 담고, 존재하지 않으면 비어있는 상태로 반환
     Optional<User> findByLoginId(String loginId);
+
+    String userId(Long userId);
 }
