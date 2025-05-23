@@ -1,7 +1,6 @@
 package com.likelion.moamoa.domain.reference.web.dto;
 
-public record SaveReferenceRes(
-        Long folderId,
+public record ReferenceDetailRes(
         Long referenceId,
         String name,
         String description,
