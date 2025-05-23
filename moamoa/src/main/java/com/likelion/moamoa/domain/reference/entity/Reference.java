@@ -26,6 +26,9 @@ public class Reference {
     @Column(name = "IMG_URL")
     private String imgUrl;
 
+    @Column(name = "REFERENCE_ORDER")
+    private Long referenceOrder;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FOLDER_ID", nullable = false)
     private Folder folder;
