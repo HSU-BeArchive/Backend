@@ -1,6 +1,7 @@
 package com.likelion.moamoa.domain.reference.web.controller;
 
 import com.likelion.moamoa.domain.reference.service.ReferenceService;
+import com.likelion.moamoa.domain.reference.web.dto.ReferenceDetailRes;
 import com.likelion.moamoa.domain.reference.web.dto.ReferenceSummaryRes;
 import com.likelion.moamoa.domain.reference.web.dto.SaveReferenceReq;
 import com.likelion.moamoa.domain.reference.web.dto.SaveReferenceRes;
@@ -41,5 +42,18 @@ public class ReferenceController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(SuccessResponse.ok(referenceSummaryRes));
+    }
+
+    // 래퍼런스 단일 조회
+    @GetMapping("/{referenceId}")
+    public ResponseEntity<SuccessResponse<?>> getReference(
+            @PathVariable Long folderId,
+            @PathVariable Long referenceId
+    ) {
+        ReferenceDetailRes referenceDetailRes = referenceService.getReference(folderId, referenceId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(SuccessResponse.ok(referenceDetailRes));
     }
 }

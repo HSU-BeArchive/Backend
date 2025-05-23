@@ -5,7 +5,9 @@ import com.likelion.moamoa.domain.folder.exception.NotFoundFolderException;
 import com.likelion.moamoa.domain.folder.repository.FolderRepository;
 import com.likelion.moamoa.domain.reference.entity.Reference;
 import com.likelion.moamoa.domain.reference.exception.DuplicateImgNameException;
+import com.likelion.moamoa.domain.reference.exception.NotFoundReferenceException;
 import com.likelion.moamoa.domain.reference.repository.ReferenceRepository;
+import com.likelion.moamoa.domain.reference.web.dto.ReferenceDetailRes;
 import com.likelion.moamoa.domain.reference.web.dto.ReferenceSummaryRes;
 import com.likelion.moamoa.domain.reference.web.dto.ReferenceSummaryRes.ReferenceSummary;
 import com.likelion.moamoa.domain.reference.web.dto.SaveReferenceReq;
@@ -85,5 +87,25 @@ public class ReferenceServiceImpl implements ReferenceService {
         }
 
         return new ReferenceSummaryRes(referenceSummaryList);
+    }
+
+    // 래퍼런스 단일 조회
+    @Override
+    public ReferenceDetailRes getReference(Long folderId, Long referenceId) {
+        Reference reference = referenceRepository.findById(referenceId)
+                .orElseThrow(NotFoundReferenceException::new);
+
+        if (!reference.getFolder().getFolderId().equals(folderId)) {
+            throw new NotFoundFolderException();
+        }
+
+        return new ReferenceDetailRes(
+                reference.getReferenceId(),
+                reference.getName(),
+                reference.getDescription(),
+                reference.getImgUrl(),
+                reference.getReferenceOrder(),
+                reference.getReferenceOrder()
+        );
     }
 }
