@@ -5,6 +5,7 @@ public record ReferenceDetailRes(
         String name,
         String description,
         String imgUrl,
-        Long referenceOrder
+        Long referenceOrder,
+        Long folderId
 ) {
 }
