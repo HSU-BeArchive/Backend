@@ -42,7 +42,7 @@ public class OpenAiServiceImpl implements OpenAiService {
 
         try {
             ResponseEntity<Map> response = restTemplate.postForEntity(
-                    openAiConfig.getApiUrl(), request, Map.class
+                    openAiConfig.getApiUrl()+"/chat/completions", request, Map.class
             );
             List<Map> choices = (List<Map>) response.getBody().get("choices");
             Map message = (Map) ((Map) choices.get(0)).get("message");
