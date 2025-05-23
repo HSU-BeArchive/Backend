@@ -10,8 +10,7 @@ public class ChatMessageReq {
     private Long userId;
 
     private Long recommendationId;
-
-    private String sessionId;
+//    private String sessionId;
 
     private String message;
 

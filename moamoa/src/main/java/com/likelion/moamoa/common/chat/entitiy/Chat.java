@@ -20,7 +20,7 @@ public class Chat extends BaseEntity {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    private String sessionUuid;
+//    private String sessionUuid;
 
     @Enumerated(EnumType.STRING)
     private MessageRole messageRole;
