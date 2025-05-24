@@ -1,6 +1,6 @@
 package com.likelion.moamoa.common.question.service;
 
-import com.likelion.moamoa.common.question.config.OpenAiConfig;
+import com.likelion.moamoa.common.config.OpenAiConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;

@@ -1,4 +1,4 @@
-package com.likelion.moamoa.common.question.config;
+package com.likelion.moamoa.common.config;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
