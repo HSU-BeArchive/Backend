@@ -7,13 +7,12 @@ import com.likelion.moamoa.common.chat.exception.NotFoundRecommendationException
 import com.likelion.moamoa.common.chat.repository.ChatRepository;
 import com.likelion.moamoa.common.chat.web.dto.ChatMessageReq;
 import com.likelion.moamoa.common.chat.web.dto.ChatMessageRes;
-import com.likelion.moamoa.common.question.config.OpenAiConfig;
+import com.likelion.moamoa.common.config.OpenAiConfig;
 import com.likelion.moamoa.common.question.entity.Recommendation;
 import com.likelion.moamoa.common.question.repository.RecommendationRepository;
 import com.likelion.moamoa.domain.auth.entity.User;
 import com.likelion.moamoa.domain.auth.exception.NotFoundLoginIdException;
 import com.likelion.moamoa.domain.auth.repository.UserRepository;
-import com.likelion.moamoa.global.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
