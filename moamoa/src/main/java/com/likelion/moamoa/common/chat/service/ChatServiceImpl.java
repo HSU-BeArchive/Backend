@@ -13,6 +13,7 @@ import com.likelion.moamoa.common.question.repository.RecommendationRepository;
 import com.likelion.moamoa.domain.auth.entity.User;
 import com.likelion.moamoa.domain.auth.exception.NotFoundLoginIdException;
 import com.likelion.moamoa.domain.auth.repository.UserRepository;
+import com.likelion.moamoa.global.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -140,19 +141,25 @@ public class ChatServiceImpl implements ChatService {
         try {
             // 4. GPT-4 API 호출
             ResponseEntity<Map> response = restTemplate.postForEntity(
-                    openAiConfig.getApiUrl() + "/chat/completions", // api 엔드포인트 url
+                    openAiConfig.getApiUrl() , // api 엔드포인트 url
                     request,
                     Map.class
             );
-
+            // 응답 처리 시작(HTTP 응답의 바디 부분만 추출하여 Map로 변환)
             Map<String, Object> responseBody = response.getBody();
+            // choices 배열 존재 확인
+            // openAi API 응답 구조:{"choices": [{"message": {"content": "....."}}]}
             if (responseBody != null && responseBody.containsKey("choices")) {
+                // choices 배열 추출 및 검증
                 List<Map<String, Object>> choices = (List<Map<String, Object>>) responseBody.get("choices");
                 if (!choices.isEmpty()) {
+                    // 첫 번째 선택지 추출
                     Map<String, Object> firstChoice = choices.get(0);
                     if (firstChoice.containsKey("message")) {
+                        // 메시지 객체 추출
                         Map<String, String> message = (Map<String, String>) firstChoice.get("message");
                         if (message.containsKey("content")) {
+                            // 실제 응답 내용 반환
                             return message.get("content").trim();
                         }
                     }
