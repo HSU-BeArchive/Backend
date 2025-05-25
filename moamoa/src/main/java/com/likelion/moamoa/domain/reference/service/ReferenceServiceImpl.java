@@ -59,12 +59,12 @@ public class ReferenceServiceImpl implements ReferenceService {
         Reference saveReference = referenceRepository.save(reference);
 
         return new SaveReferenceRes(
-                saveReference.getFolder().getFolderId(),
                 saveReference.getReferenceId(),
                 saveReference.getName(),
                 saveReference.getDescription(),
                 saveReference.getImgUrl(),
-                saveReference.getReferenceOrder()
+                saveReference.getReferenceOrder(),
+                saveReference.getFolder().getFolderId()
         );
     }
 
@@ -81,6 +81,7 @@ public class ReferenceServiceImpl implements ReferenceService {
         for (Reference reference : references) {
             ReferenceSummary referenceSummary = new ReferenceSummary(
                     reference.getReferenceId(),
+                    reference.getName(),
                     reference.getReferenceOrder(),
                     reference.getImgUrl()
             );

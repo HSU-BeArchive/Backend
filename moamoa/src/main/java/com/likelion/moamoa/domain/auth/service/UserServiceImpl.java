@@ -5,10 +5,7 @@ import com.likelion.moamoa.domain.auth.exception.DuplicateLoginIdException;
 import com.likelion.moamoa.domain.auth.exception.InvalidPasswordException;
 import com.likelion.moamoa.domain.auth.exception.NotFoundLoginIdException;
 import com.likelion.moamoa.domain.auth.repository.UserRepository;
-import com.likelion.moamoa.domain.auth.web.dto.SigninUserReq;
-import com.likelion.moamoa.domain.auth.web.dto.SigninUserRes;
-import com.likelion.moamoa.domain.auth.web.dto.SignupUserReq;
-import com.likelion.moamoa.domain.auth.web.dto.SignupUserRes;
+import com.likelion.moamoa.domain.auth.web.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,14 +15,23 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
-    // 회원 가입
     @Override
-    public SignupUserRes signup(SignupUserReq signupUserReq) {
+    public void loginIdCheck(loginIdCheckReq loginIdCheckReq) {
         // 아이디 중복 검사
-        if (userRepository.existsByLoginId(signupUserReq.getLoginId())) {
+        if (userRepository.existsByLoginId(loginIdCheckReq.getLoginId())) {
             // 아이디 중복이 있는 경우 에러 반환
             throw new DuplicateLoginIdException();
         }
+    }
+
+    // 회원 가입
+    @Override
+    public SignupUserRes signup(SignupUserReq signupUserReq) {
+//        // 아이디 중복 검사 -> "중복 체크를 따로 뺌"
+//        if (userRepository.existsByLoginId(signupUserReq.getLoginId())) {
+//            // 아이디 중복이 있는 경우 에러 반환
+//            throw new DuplicateLoginIdException();
+//        }
 
         // User 생성
         User user = User.builder()
