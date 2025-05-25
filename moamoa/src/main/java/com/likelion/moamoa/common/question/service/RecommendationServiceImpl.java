@@ -36,24 +36,26 @@ public class RecommendationServiceImpl implements RecommendationService {
 
         String question = openAiService.getRecommendationQuestion(imgUrl, description);
 
-        Recommendation recommendation = new Recommendation(question, reference);
-        Recommendation saved = recommendationRepository.save(recommendation);
-
         Folder folder = reference.getFolder();
         User user = folder.getUser();
 
-
-        return CreateQuestionRes.builder()
-                .recommendationId(saved.getRecommendationId())
-                .userId(user.getUserId())
-                .folderId(folder.getFolderId())
-                .referenceId(reference.getReferenceId())
-                .question(saved.getQuestion())
+        Recommendation recommendation = Recommendation
+                .builder()
+                .question(question)
+                .reference(reference)
                 .build();
+
+        Recommendation saved = recommendationRepository.save(recommendation);
+
+
+        return new CreateQuestionRes(
+                saved.getRecommendationId(),
+                saved.getQuestion(),
+                saved.getReference().getFolder().getUser().getUserId(),
+                saved.getReference().getFolder().getFolderId(),
+                saved.getReference().getReferenceId()
+        );
     }
-
-
-
-    }
+}
 
 

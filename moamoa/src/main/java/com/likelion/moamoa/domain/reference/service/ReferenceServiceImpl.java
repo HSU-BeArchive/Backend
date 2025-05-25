@@ -14,6 +14,7 @@ import com.likelion.moamoa.domain.reference.web.dto.SaveReferenceReq;
 import com.likelion.moamoa.domain.reference.web.dto.SaveReferenceRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import java.util.ArrayList;
@@ -52,7 +53,7 @@ public class ReferenceServiceImpl implements ReferenceService {
                 .name(saveReferenceReq.getName())
                 .description(saveReferenceReq.getDescription())
                 .imgUrl(url)
-                .referenceOrder(referenceRepository.count()) // 0번부터 시작
+                .referenceOrder(referenceRepository.countReferenceByFolder_FolderId(folderId)) // 0번부터 시작
                 .build();
 
         Reference saveReference = referenceRepository.save(reference);
@@ -74,7 +75,7 @@ public class ReferenceServiceImpl implements ReferenceService {
         Folder folder = folderRepository.findById(folderId)
                 .orElseThrow(NotFoundFolderException::new);
 
-        List<Reference> references = referenceRepository.findAll();
+        List<Reference> references = referenceRepository.findAllByFolder_FolderId(folderId);
         List<ReferenceSummary> referenceSummaryList = new ArrayList<>();
 
         for (Reference reference : references) {
@@ -86,7 +87,7 @@ public class ReferenceServiceImpl implements ReferenceService {
             referenceSummaryList.add(referenceSummary);
         }
 
-        return new ReferenceSummaryRes(referenceSummaryList);
+        return new ReferenceSummaryRes(folder.getFolderId(), referenceSummaryList);
     }
 
     // 래퍼런스 단일 조회
@@ -107,5 +108,22 @@ public class ReferenceServiceImpl implements ReferenceService {
                 reference.getReferenceOrder(),
                 reference.getReferenceOrder()
         );
+    }
+
+    // 래퍼런스 삭제
+    @Transactional
+    @Override
+    public void deleteReference(Long folderId, Long referenceId) {
+        Reference reference = referenceRepository.findById(referenceId)
+                .orElseThrow(NotFoundReferenceException::new);
+
+        if (!reference.getFolder().getFolderId().equals(folderId)) {
+            throw new NotFoundFolderException();
+        }
+
+        // 이미지 S3에서 삭제
+        imageService.deleteImageFromS3(reference.getImgUrl());
+
+        referenceRepository.delete(reference);
     }
 }

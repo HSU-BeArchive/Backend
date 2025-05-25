@@ -3,7 +3,7 @@ package com.likelion.moamoa.domain.folder.web.controller;
 import com.likelion.moamoa.domain.folder.service.FolderService;
 import com.likelion.moamoa.domain.folder.web.dto.CreateFolderReq;
 import com.likelion.moamoa.domain.folder.web.dto.CreateFolderRes;
-import com.likelion.moamoa.domain.folder.web.dto.FolderSummeryRes;
+import com.likelion.moamoa.domain.folder.web.dto.FolderSummaryRes;
 import com.likelion.moamoa.global.response.SuccessResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,7 @@ public class FolderController {
     // 폴더 전체 조회
     @GetMapping
     public ResponseEntity<SuccessResponse<?>> getAllByFolder(@PathVariable Long userId) {
-        FolderSummeryRes folderSummeryRes = folderService.getAllByFolder(userId);
+        FolderSummaryRes folderSummeryRes = folderService.getAllByFolder(userId);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

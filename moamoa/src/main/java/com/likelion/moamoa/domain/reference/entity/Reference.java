@@ -1,9 +1,10 @@
 package com.likelion.moamoa.domain.reference.entity;
 
-import com.likelion.moamoa.domain.auth.entity.User;
+import com.likelion.moamoa.common.question.entity.Recommendation;
 import com.likelion.moamoa.domain.folder.entity.Folder;
 import jakarta.persistence.*;
 import lombok.*;
+
 
 @Entity
 @Getter
@@ -33,4 +34,13 @@ public class Reference {
     @JoinColumn(name = "FOLDER_ID", nullable = false)
     private Folder folder;
 
+    @OneToOne(mappedBy = "reference", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Recommendation recommendation;
+
+    public void deleteRecommendation(Recommendation recommendation) {
+        Reference reference = recommendation.getReference(); // 양방향 관계일 경우
+        if (reference != null) {
+            reference.setRecommendation(null); // orphanRemoval = true이면 Recommendation 삭제됨
+        }
+    }
 }
