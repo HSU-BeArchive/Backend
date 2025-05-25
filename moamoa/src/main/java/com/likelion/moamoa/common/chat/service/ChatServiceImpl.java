@@ -37,6 +37,7 @@ public class ChatServiceImpl implements ChatService {
     // 메시지 전송 메서드
     @Override
     public ChatMessageRes sendMessage(ChatMessageReq chatMessageReq) {
+
         // 사용자 검증 (findById는 기본키를 검증)
         User user = userRepository.findById(chatMessageReq.getUserId())
                 .orElseThrow(NotFoundLoginIdException::new);
@@ -46,17 +47,9 @@ public class ChatServiceImpl implements ChatService {
                 .orElseThrow(NotFoundRecommendationException::new);
 
 
-//                // 세션 관리
-//                // 새로운 대화는 Id 생성 기존 대화는 이전 기존 대화의 Id 사용
-//                String sessionId = chatMessageReq.getSessionId(); // chatMessageReq 객체에서 sessionId를 가져옴
-//                if (sessionId == null || sessionId.isEmpty()) { // sessionId가 없는 지 확인
-//                    sessionId = UUID.randomUUID().toString(); // 비어있다면 새로운 세션 Id 생성 (UUID = 전 세계적으로 유일성이 보장되는 식별자)
-//                }
-
         // 사용자 메시지 저장
         Chat userLog = Chat.builder()
                 .recommendation(recommendation)
-//                        .sessionUuid(sessionId)
                 .content(chatMessageReq.getMessage())
                 .messageRole(MessageRole.USER)
                 .build();
@@ -84,6 +77,7 @@ public class ChatServiceImpl implements ChatService {
                         "현재 브레인스토밍 중인 추천 질문은 다음과 같습니다: " +
                         recommendation.getQuestion()));
 
+
         // 이전 대화 내용 추가 (최근 10개 메시지)
         int startIndex = Math.max(0, previousLogs.size() - 10); // previousLogs에 저장 되어 있는 채팅 중 최근 10개 메시지부터 시작
         for (int i = startIndex; i < previousLogs.size(); i++) {
@@ -103,7 +97,6 @@ public class ChatServiceImpl implements ChatService {
         // 봇 응답 저장
         Chat botLog = Chat.builder()
                 .recommendation(recommendation)
-//                        .sessionUuid(sessionId)
                 .content(botResponse)
                 .messageRole(MessageRole.AI)
                 .build();
@@ -112,14 +105,12 @@ public class ChatServiceImpl implements ChatService {
         // 응답 반환
         return ChatMessageRes.builder()
                 .chatId(savedBotLog.getChatId())
-//                        .sessionId(savedBotLog.getSessionUuid())
                 .recommendationId(recommendation.getRecommendationId())
                 .message(savedBotLog.getContent())
                 .messageRole(savedBotLog.getMessageRole())
                 .createdAt(savedBotLog.getCreatedAt())
                 .build();
     }
-
 
     // OpenAI API 호출 로직 구현
     private String getResponseFromOpenAI(List<Map<String, String>> messages) {
@@ -130,7 +121,7 @@ public class ChatServiceImpl implements ChatService {
         body.put("temperature", 0.7); // 창의성 조절 (0.0 - 2.0, 기본값 1.0)
         body.put("max_tokens", 200); // 최대 응답 길이 제한
 
-        // 3. Http 헤더 준비
+        // 2. Http 헤더 준비
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON); // 요청 본문 json
         headers.setBearerAuth(openAiConfig.getApiKey()); // api 키 설정
@@ -138,7 +129,7 @@ public class ChatServiceImpl implements ChatService {
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
         try {
-            // 4. GPT-4 API 호출
+            // 3. GPT-4 API 호출
             ResponseEntity<Map> response = restTemplate.postForEntity(
                     openAiConfig.getApiUrl() , // api 엔드포인트 url
                     request,
@@ -171,28 +162,19 @@ public class ChatServiceImpl implements ChatService {
             throw new RuntimeException("GPT-4 API 호출 실패: " + e.getMessage());
         }
     }
+  
+    @Override     
+    public List<ChatMessageRes> getChatHistory(Long recommendation) {
+        List<Chat> chatLogs = chatRepository.findByRecommendation_RecommendationIdOrderByCreatedAtAsc(recommendation);
 
-    @Override
-    public List<ChatMessageRes> getChatHistory(Long recommendationId) {
-        Recommendation recommendation = recommendationRepository.findById(recommendationId)
-                .orElseThrow(NotFoundRecommendationException::new);
-
-        return chatRepository
-                .findByRecommendationRecommendationIdOrderByCreatedAtAsc(recommendationId)
-                .stream()
-                .map(chat -> new ChatMessageRes(
-                        chat.getChatId(),
-//                      .sessionUuid(chat.getSessionUuid()),
-                        recommendationId,
-                        chat.getContent(),
-                        chat.getMessageRole(),
-                        chat.getCreatedAt()
-                ))
+        return chatLogs.stream()
+                .map(chat -> ChatMessageRes.builder()
+                        .chatId(chat.getChatId())
+                        .recommendationId(chat.getRecommendation().getRecommendationId())
+                        .message(chat.getContent())
+                        .messageRole(chat.getMessageRole())
+                        .createdAt(chat.getCreatedAt())
+                        .build())
                 .collect(Collectors.toList());
     }
 }
-
-
-
-
-
