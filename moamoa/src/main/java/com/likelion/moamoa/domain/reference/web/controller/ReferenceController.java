@@ -56,4 +56,17 @@ public class ReferenceController {
                 .status(HttpStatus.OK)
                 .body(SuccessResponse.ok(referenceDetailRes));
     }
+
+    // 래퍼런스 삭제
+    @DeleteMapping("/{referenceId}")
+    public ResponseEntity<SuccessResponse<?>> deleteReference(
+            @PathVariable Long folderId,
+            @PathVariable Long referenceId
+    ) {
+        referenceService.deleteReference(folderId, referenceId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(SuccessResponse.empty());
+    }
 }

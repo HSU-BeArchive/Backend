@@ -44,4 +44,16 @@ public class ImageServiceImpl implements ImageService {
             return null;
         }
     }
+
+    @Override
+    public void deleteImageFromS3(String imgUrl) {
+        try {
+            // https://[bucket].s3.amazonaws.com/[filename] 에서 파일명 추출
+            String fileName = imgUrl.substring(imgUrl.lastIndexOf("/") + 1);
+
+            amazonS3Client.deleteObject(bucket, fileName);
+        } catch (Exception e) {
+            e.printStackTrace(); // 로그 출력 (실무에선 Logger 권장)
+        }
+    }
 }

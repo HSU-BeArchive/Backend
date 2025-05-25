@@ -1,4 +1,6 @@
 package com.likelion.moamoa.domain.auth.web.dto;
 
-public record SigninUserRes(String loginId) {
+public record SigninUserRes(
+        Long userId,
+        String loginId) {
 }
