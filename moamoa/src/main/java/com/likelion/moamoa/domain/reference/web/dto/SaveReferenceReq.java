@@ -13,13 +13,13 @@ import org.springframework.web.multipart.MultipartFile;
 public class SaveReferenceReq {
 
     @NotBlank(message = "사진 이름은 필수값입니다.")
-    private String name;
+    private String referenceName;
 
     @NotBlank(message = "사진 설명은 필수값입니다.")
-    private String description;
+    private String referenceDescription;
 
     @NotNull(message = "사진은 필수입니다.")
-    private MultipartFile img;
+    private MultipartFile referenceImg;
 
     /*
         | 어노테이션   | null 허용 | "" 허용 | " " 허용 |
