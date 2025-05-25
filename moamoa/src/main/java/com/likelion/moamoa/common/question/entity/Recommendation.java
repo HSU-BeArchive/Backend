@@ -1,9 +1,13 @@
 package com.likelion.moamoa.common.question.entity;
 
+import com.likelion.moamoa.common.chat.entitiy.Chat;
 import com.likelion.moamoa.domain.auth.entity.User;
 import com.likelion.moamoa.domain.reference.entity.Reference;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -22,5 +26,8 @@ public class Recommendation {
     @OneToOne
     @JoinColumn(name = "REFERENCE_ID") // FK 가짐
     private Reference reference;
+
+    @OneToMany(mappedBy = "recommendation", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Chat> chatList = new ArrayList<>();
 
 }

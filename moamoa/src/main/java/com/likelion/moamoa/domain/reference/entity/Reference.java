@@ -37,10 +37,4 @@ public class Reference {
     @OneToOne(mappedBy = "reference", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Recommendation recommendation;
 
-    public void deleteRecommendation(Recommendation recommendation) {
-        Reference reference = recommendation.getReference(); // 양방향 관계일 경우
-        if (reference != null) {
-            reference.setRecommendation(null); // orphanRemoval = true이면 Recommendation 삭제됨
-        }
-    }
 }

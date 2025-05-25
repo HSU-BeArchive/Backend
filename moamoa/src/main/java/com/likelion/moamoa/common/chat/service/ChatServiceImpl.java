@@ -45,25 +45,16 @@ public class ChatServiceImpl implements ChatService{
                 Recommendation recommendation = recommendationRepository.findById(chatMessageReq.getRecommendationId())
                         .orElseThrow(NotFoundRecommendationException::new);
 
-
-                // 세션 관리
-                // 새로운 대화는 Id 생성 기존 대화는 이전 기존 대화의 Id 사용
-                String sessionId = chatMessageReq.getSessionId(); // chatMessageReq 객체에서 sessionId를 가져옴
-                if (sessionId == null || sessionId.isEmpty()) { // sessionId가 없는 지 확인
-                    sessionId = UUID.randomUUID().toString(); // 비어있다면 새로운 세션 Id 생성 (UUID = 전 세계적으로 유일성이 보장되는 식별자)
-                }
-
                 // 사용자 메시지 저장
                 Chat userLog = Chat.builder()
                         .recommendation(recommendation)
-                        .sessionUuid(sessionId) // sessionUuid 필드명 사용
                         .content(chatMessageReq.getMessage())
                         .messageRole(MessageRole.USER)
                         .build();
                 chatRepository.save(userLog);
 
                 // 이전 대화 내용 가져오기(챗봇이 전의 대화를 이해할 수 있도록)
-                List<Chat> previousLogs = chatRepository.findBySessionUuidOrderByCreatedAtAsc(sessionId);
+                List<Chat> previousLogs = chatRepository.findByRecommendation_RecommendationIdOrderByCreatedAtAsc(recommendation.getRecommendationId());
 
                 // OpenAI API에 전송할 메시지 형식으로 변환
                 // role과 content를 키-값 쌍으로 가짐
@@ -103,7 +94,6 @@ public class ChatServiceImpl implements ChatService{
                 // 봇 응답 저장
                 Chat botLog = Chat.builder()
                         .recommendation(recommendation)
-                        .sessionUuid(sessionId)
                         .content(botResponse)
                         .messageRole(MessageRole.AI)
                         .build();
@@ -112,7 +102,6 @@ public class ChatServiceImpl implements ChatService{
                 // 응답 반환
                 return ChatMessageRes.builder()
                         .chatId(savedBotLog.getChatId())
-                        .sessionId(savedBotLog.getSessionUuid())
                         .message(savedBotLog.getContent())
                         .messageRole(savedBotLog.getMessageRole())
                         .createdAt(savedBotLog.getCreatedAt())
@@ -166,13 +155,13 @@ public class ChatServiceImpl implements ChatService{
                 }
             }
     @Override
-    public List<ChatMessageRes> getChatHistory(String sessionId) {
-        List<Chat> chatLogs = chatRepository.findBySessionUuidOrderByCreatedAtAsc(sessionId);
+    public List<ChatMessageRes> getChatHistory(Long recommendation) {
+        List<Chat> chatLogs = chatRepository.findByRecommendation_RecommendationIdOrderByCreatedAtAsc(recommendation);
 
         return chatLogs.stream()
                 .map(chat -> ChatMessageRes.builder()
                         .chatId(chat.getChatId())
-                        .sessionId(chat.getSessionUuid())
+                        .recommendationId(chat.getRecommendation().getRecommendationId())
                         .message(chat.getContent())
                         .messageRole(chat.getMessageRole())
                         .createdAt(chat.getCreatedAt())
