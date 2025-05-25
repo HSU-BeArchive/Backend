@@ -14,4 +14,7 @@ public interface FolderService {
 
     // 폴더 삭제
     void deleteOneFolder(Long userId, Long folderid);
+
+    // 폴더 순서 변경
+    ChangeFolderRes changeFolderOrder(Long userId, Long folderId, ChangeFolderReq changeFolderReq);
 }

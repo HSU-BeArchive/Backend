@@ -64,4 +64,18 @@ public class FolderController {
                 .status(HttpStatus.OK)
                 .body(SuccessResponse.empty());
     }
+
+    // 폴더 위치 순서 변경
+    @PutMapping("/{folderId}/order")
+    public ResponseEntity<SuccessResponse<?>> changeFolderOrder(
+            @PathVariable Long userId,
+            @PathVariable Long folderId,
+            @RequestBody @Valid ChangeFolderReq changeFolderReq
+    ) {
+        ChangeFolderRes changeFolderRes = folderService.changeFolderOrder(userId, folderId, changeFolderReq);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(SuccessResponse.ok(changeFolderRes));
+    }
 }
