@@ -34,10 +34,11 @@ public class ChatController {
     }
 
 
-    @GetMapping("/history/{sessionId}")
-    public ResponseEntity<SuccessResponse<List<ChatMessageRes>>> getChatHistory(@PathVariable("sessionId") String sessionId) {
-
-        List<ChatMessageRes> chatHistory = chatService.getChatHistory(sessionId);
+    @GetMapping("/history/{recommendationId}")
+    public ResponseEntity<SuccessResponse<List<ChatMessageRes>>> getChatHistory(
+            @PathVariable("recommendationId") Long recommendationId
+    ) {
+        List<ChatMessageRes> chatHistory = chatService.getChatHistory(recommendationId);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(SuccessResponse.ok(chatHistory));

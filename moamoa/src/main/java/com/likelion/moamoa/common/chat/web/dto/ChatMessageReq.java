@@ -11,8 +11,6 @@ public class ChatMessageReq {
 
     private Long recommendationId;
 
-    private String sessionId;
-
     private String message;
 
 }

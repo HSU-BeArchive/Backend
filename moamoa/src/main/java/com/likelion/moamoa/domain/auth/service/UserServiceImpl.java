@@ -54,7 +54,9 @@ public class UserServiceImpl implements UserService {
         }
 
         // 반환
-        return new SigninUserRes(user.getLoginId());
+        return new SigninUserRes(
+                user.getUserId(),
+                user.getLoginId());
     }
 
 }

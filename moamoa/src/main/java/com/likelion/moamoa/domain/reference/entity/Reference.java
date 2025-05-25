@@ -1,9 +1,10 @@
 package com.likelion.moamoa.domain.reference.entity;
 
-import com.likelion.moamoa.domain.auth.entity.User;
+import com.likelion.moamoa.common.question.entity.Recommendation;
 import com.likelion.moamoa.domain.folder.entity.Folder;
 import jakarta.persistence.*;
 import lombok.*;
+
 
 @Entity
 @Getter
@@ -32,5 +33,8 @@ public class Reference {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FOLDER_ID", nullable = false)
     private Folder folder;
+
+    @OneToOne(mappedBy = "reference", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Recommendation recommendation;
 
 }

@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface ChatRepository extends JpaRepository<Chat, Long> {
 
-    List<Chat> findBySessionUuidOrderByCreatedAtAsc(String sessionUuid);
+    List<Chat> findByRecommendation_RecommendationIdOrderByCreatedAtAsc(Long recommendationId);
 }
