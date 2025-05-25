@@ -2,9 +2,9 @@ package com.likelion.moamoa.domain.reference.web.dto;
 
 public record ReferenceDetailRes(
         Long referenceId,
-        String name,
-        String description,
-        String imgUrl,
+        String referenceName,
+        String referenceDescription,
+        String referenceImgUrl,
         Long referenceOrder,
         Long folderId
 ) {

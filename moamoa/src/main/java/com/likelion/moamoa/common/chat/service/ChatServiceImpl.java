@@ -56,7 +56,7 @@ public class ChatServiceImpl implements ChatService {
         chatRepository.save(userLog);
 
         // 이전 대화 내용 가져오기(챗봇이 전의 대화를 이해할 수 있도록)
-        List<Chat> previousLogs = chatRepository.findByRecommendationRecommendationIdOrderByCreatedAtAsc(chatMessageReq.getRecommendationId());
+        List<Chat> previousLogs = chatRepository.findByRecommendation_RecommendationIdOrderByCreatedAtAsc(chatMessageReq.getRecommendationId());
 
         // OpenAI API에 전송할 메시지 형식으로 변환
         // role과 content를 키-값 쌍으로 가짐
