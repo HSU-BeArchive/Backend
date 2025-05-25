@@ -35,8 +35,9 @@ public class ChatController {
 
 
     @GetMapping("/history/{recommendationId}")
-    public ResponseEntity<SuccessResponse<List<ChatMessageRes>>> getChatHistory(@PathVariable Long recommendationId) {
-
+    public ResponseEntity<SuccessResponse<List<ChatMessageRes>>> getChatHistory(
+            @PathVariable("recommendationId") Long recommendationId
+    ) {
         List<ChatMessageRes> chatHistory = chatService.getChatHistory(recommendationId);
         return ResponseEntity
                 .status(HttpStatus.OK)
