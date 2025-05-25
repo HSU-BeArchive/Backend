@@ -1,10 +1,7 @@
 package com.likelion.moamoa.domain.auth.web.controller;
 
 import com.likelion.moamoa.domain.auth.service.UserService;
-import com.likelion.moamoa.domain.auth.web.dto.SigninUserReq;
-import com.likelion.moamoa.domain.auth.web.dto.SigninUserRes;
-import com.likelion.moamoa.domain.auth.web.dto.SignupUserReq;
-import com.likelion.moamoa.domain.auth.web.dto.SignupUserRes;
+import com.likelion.moamoa.domain.auth.web.dto.*;
 import com.likelion.moamoa.global.response.SuccessResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +18,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     // 의존성 부여
     private final UserService userService;
+
+    // 로그인 아이디 중복 체크 확인
+    @PostMapping("check")
+    public ResponseEntity<SuccessResponse<?>> check(
+            @RequestBody @Valid loginIdCheckReq loginIdCheckReq
+    ) {
+        userService.loginIdCheck(loginIdCheckReq);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(SuccessResponse.empty());
+    }
 
     // 회원 가입
     @PostMapping("/signup")
