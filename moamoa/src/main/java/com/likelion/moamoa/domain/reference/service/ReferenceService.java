@@ -12,4 +12,6 @@ public interface ReferenceService {
     ReferenceSummaryRes getAllReference(Long folderId);
     // 래퍼런스 단일 조회
     ReferenceDetailRes getReference(Long folderId, Long referenceId);
+    // 래퍼런스 삭제
+    void deleteReference(Long folderId, Long referenceId);
 }

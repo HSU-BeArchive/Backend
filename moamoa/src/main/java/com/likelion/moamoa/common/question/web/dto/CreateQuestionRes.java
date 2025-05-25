@@ -5,9 +5,9 @@ import lombok.Builder;
 @Builder
 public record CreateQuestionRes(
         Long recommendationId,
+        String question,
         Long userId,
         Long folderId,
-        Long referenceId,
-        String question
+        Long referenceId
 ) {
 }
