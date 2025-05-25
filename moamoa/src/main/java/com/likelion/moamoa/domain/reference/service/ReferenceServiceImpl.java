@@ -47,6 +47,7 @@ public class ReferenceServiceImpl implements ReferenceService {
         // s3에 저장된 이미지 url 받아오기
         String url = imageService.uploadImageToS3(saveReferenceReq.getReferenceImg());
 
+
         // reference 저장
         Reference reference = Reference.builder()
                 .folder(folder)

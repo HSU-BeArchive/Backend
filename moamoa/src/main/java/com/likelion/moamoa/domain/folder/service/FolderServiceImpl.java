@@ -78,6 +78,28 @@ public class FolderServiceImpl implements FolderService {
         return new FolderSummaryRes(user.getUserId(), folderSummaryList);
     }
 
+    // 폴더 전체 조회
+    @Override
+    public FolderSummaryRes getAllByFolder(Long userId) {
+        // userId -> User 확인
+        User user = userRepository.findById(userId)
+                .orElseThrow(NotFoundUserException::new);
+
+        List<Folder> folders = folderRepository.findAllByUser_UserId(userId);
+        List<FolderSummary> folderSummaryList = new ArrayList<>();
+
+        for (Folder folder : folders) {
+            FolderSummary folderSummary = new FolderSummary(
+                    folder.getFolderId(),
+                    folder.getFolderName(),
+                    folder.getFolderOrder()
+            );
+            folderSummaryList.add(folderSummary);
+        }
+
+        return new FolderSummaryRes(user.getUserId(), folderSummaryList);
+    }
+  
     // 폴더 이름 변경
     @Transactional
     @Override

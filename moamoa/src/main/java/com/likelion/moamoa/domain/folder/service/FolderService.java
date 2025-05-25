@@ -1,6 +1,8 @@
 package com.likelion.moamoa.domain.folder.service;
 
-import com.likelion.moamoa.domain.folder.web.dto.*;
+import com.likelion.moamoa.domain.folder.web.dto.CreateFolderReq;
+import com.likelion.moamoa.domain.folder.web.dto.CreateFolderRes;
+import com.likelion.moamoa.domain.folder.web.dto.FolderSummaryRes;
 
 public interface FolderService {
     // 폴더 생성
