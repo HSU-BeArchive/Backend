@@ -8,8 +8,9 @@ public record ReferenceSummaryRes(
 ) {
     public record ReferenceSummary(
             Long referenceId,
+            String referenceName,
             Long referenceOrder,
-            String imgUrl
+            String referenceImgUrl
     ) {
     }
 }
