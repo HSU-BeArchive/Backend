@@ -7,9 +7,7 @@ import com.likelion.moamoa.domain.folder.exception.DuplicateFolderNameException;
 import com.likelion.moamoa.domain.folder.exception.NotFoundFolderException;
 import com.likelion.moamoa.domain.folder.exception.NotFoundUserException;
 import com.likelion.moamoa.domain.folder.repository.FolderRepository;
-import com.likelion.moamoa.domain.folder.web.dto.CreateFolderReq;
-import com.likelion.moamoa.domain.folder.web.dto.CreateFolderRes;
-import com.likelion.moamoa.domain.folder.web.dto.FolderSummaryRes;
+import com.likelion.moamoa.domain.folder.web.dto.*;
 import com.likelion.moamoa.domain.folder.web.dto.FolderSummaryRes.FolderSummary;
 import com.likelion.moamoa.domain.reference.entity.Reference;
 import com.likelion.moamoa.domain.reference.service.ImageService;
@@ -19,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -79,6 +76,37 @@ public class FolderServiceImpl implements FolderService {
         }
 
         return new FolderSummaryRes(user.getUserId(), folderSummaryList);
+    }
+
+    // 폴더 이름 변경
+    @Transactional
+    @Override
+    public ModifyFolderRes modifyFolderName(
+            Long userId,
+            Long folderId,
+            ModifyFolderReq modifyFolderReq
+    ) {
+        Folder folder = folderRepository.findById(folderId)
+                .orElseThrow(NotFoundFolderException::new);
+
+        if (!folder.getUser().getUserId().equals(userId)) {
+            throw new NotFoundUserException();
+        }
+
+        // 폴더 이름 중복 예외
+        if(folderRepository.existsByFolderNameAndUser_UserId(modifyFolderReq.getFolderName(), userId)) {
+            throw new DuplicateFolderNameException();
+        }
+
+        String folderNameBefore = folder.getFolderName(); // 바뀌기 전 이름
+        folder.setFolderName(modifyFolderReq.getFolderName());
+
+        return new ModifyFolderRes(
+                folder.getUser().getUserId(),
+                folder.getFolderId(),
+                folderNameBefore,
+                folder.getFolderName()
+        );
     }
 
     // 폴더 삭제
