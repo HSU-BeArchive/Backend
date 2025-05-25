@@ -34,9 +34,4 @@ public class Folder {
     @OneToMany(mappedBy = "folder", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Reference> references = new ArrayList<>();
 
-    // 편의 메서드 -> 폴더가 삭제 될 때, 폴더 안에 사진들을 삭제 하기 위함
-//    public void removeReference(Reference reference) {
-//        references.remove(reference);
-//        reference.setFolder(null);
-//    }
 }

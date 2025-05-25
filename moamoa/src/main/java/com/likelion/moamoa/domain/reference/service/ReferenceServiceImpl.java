@@ -40,18 +40,18 @@ public class ReferenceServiceImpl implements ReferenceService {
                 .orElseThrow(NotFoundFolderException::new);
 
         // 파일명 중복 확인
-        if (referenceRepository.existsByName(saveReferenceReq.getName())) {
+        if (referenceRepository.existsByName(saveReferenceReq.getReferenceName())) {
             throw new DuplicateImgNameException();
         }
 
         // s3에 저장된 이미지 url 받아오기
-        String url = imageService.uploadImageToS3(saveReferenceReq.getImg());
+        String url = imageService.uploadImageToS3(saveReferenceReq.getReferenceImg());
 
         // reference 저장
         Reference reference = Reference.builder()
                 .folder(folder)
-                .name(saveReferenceReq.getName())
-                .description(saveReferenceReq.getDescription())
+                .name(saveReferenceReq.getReferenceName())
+                .description(saveReferenceReq.getReferenceDescription())
                 .imgUrl(url)
                 .referenceOrder(referenceRepository.countReferenceByFolder_FolderId(folderId)) // 0번부터 시작
                 .build();

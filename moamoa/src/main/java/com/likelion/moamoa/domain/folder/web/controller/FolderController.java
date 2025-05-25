@@ -1,9 +1,7 @@
 package com.likelion.moamoa.domain.folder.web.controller;
 
 import com.likelion.moamoa.domain.folder.service.FolderService;
-import com.likelion.moamoa.domain.folder.web.dto.CreateFolderReq;
-import com.likelion.moamoa.domain.folder.web.dto.CreateFolderRes;
-import com.likelion.moamoa.domain.folder.web.dto.FolderSummaryRes;
+import com.likelion.moamoa.domain.folder.web.dto.*;
 import com.likelion.moamoa.global.response.SuccessResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +36,20 @@ public class FolderController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(SuccessResponse.ok(folderSummeryRes));
+    }
+
+    // 폴더 이름 수정
+    @PutMapping("/{folderId}")
+    public ResponseEntity<SuccessResponse<?>> modifyFolder(
+            @PathVariable Long userId,
+            @PathVariable Long folderId,
+            @RequestBody @Valid ModifyFolderReq modifyFolderReq
+    ) {
+        ModifyFolderRes modifyFolderRes = folderService.modifyFolderName(userId, folderId, modifyFolderReq);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(SuccessResponse.ok(modifyFolderRes));
     }
 
     // 폴더 삭제
