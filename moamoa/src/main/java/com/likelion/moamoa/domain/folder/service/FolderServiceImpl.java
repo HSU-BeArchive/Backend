@@ -4,6 +4,7 @@ import com.likelion.moamoa.domain.auth.entity.User;
 import com.likelion.moamoa.domain.auth.repository.UserRepository;
 import com.likelion.moamoa.domain.folder.entity.Folder;
 import com.likelion.moamoa.domain.folder.exception.DuplicateFolderNameException;
+import com.likelion.moamoa.domain.folder.exception.InvalidFolderOrderException;
 import com.likelion.moamoa.domain.folder.exception.NotFoundFolderException;
 import com.likelion.moamoa.domain.folder.exception.NotFoundUserException;
 import com.likelion.moamoa.domain.folder.repository.FolderRepository;
@@ -132,5 +133,43 @@ public class FolderServiceImpl implements FolderService {
         }
 
         folderRepository.delete(folder);
+    }
+
+    // 펄더 순서 변경
+    @Transactional
+    @Override
+    public ChangeFolderRes changeFolderOrder(Long userId, Long folderId, ChangeFolderReq changeFolderReq) {
+        Folder folder = folderRepository.findById(folderId)
+                .orElseThrow(NotFoundFolderException::new);
+
+        if (!folder.getUser().getUserId().equals(userId)) {
+            throw new NotFoundUserException();
+        }
+
+        Long orderBefore = folder.getFolderOrder();
+        Long orderAfter = changeFolderReq.getFolderOrderAfter();
+
+        if (orderAfter < 0 || orderAfter >= folderRepository.countFolderByUser_UserId(userId)) {
+            throw new InvalidFolderOrderException();
+        }
+
+        if (orderBefore < orderAfter) {
+            folderRepository.findAllByUser_UserId(userId).stream()
+                    .filter(f -> f.getFolderOrder() > orderBefore && f.getFolderOrder() <= orderAfter)
+                    .forEach(f -> f.setFolderOrder(f.getFolderOrder() - 1));
+        } else {
+            folderRepository.findAllByUser_UserId(userId).stream()
+                    .filter(f -> f.getFolderOrder() >= orderAfter && f.getFolderOrder() < orderBefore)
+                    .forEach(f -> f.setFolderOrder(f.getFolderOrder() + 1));
+        }
+
+        folder.setFolderOrder(orderAfter);
+
+        return new ChangeFolderRes(
+                folder.getUser().getUserId(),
+                folder.getFolderId(),
+                orderBefore,
+                folder.getFolderOrder()
+        );
     }
 }
