@@ -1,6 +1,6 @@
 package com.likelion.moamoa.common.question.service;
 
-import com.likelion.moamoa.common.question.config.OpenAiConfig;
+import com.likelion.moamoa.common.config.OpenAiConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -42,7 +42,7 @@ public class OpenAiServiceImpl implements OpenAiService {
 
         try {
             ResponseEntity<Map> response = restTemplate.postForEntity(
-                    openAiConfig.getApiUrl()+"/chat/completions", request, Map.class
+                    openAiConfig.getApiUrl(), request, Map.class
             );
             List<Map> choices = (List<Map>) response.getBody().get("choices");
             Map message = (Map) ((Map) choices.get(0)).get("message");
