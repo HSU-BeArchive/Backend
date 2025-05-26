@@ -90,7 +90,24 @@ public List<ExtractKeywordRes> extractKeyword(ExtractKeywordReq extractKeywordRe
             .toList();
 }
 
-private Map<String, Long> extractKeywordsFromGPT(String chatContent) {
+    @Override
+    public List<ExtractKeywordRes> getKeywords(Long folderId) {
+        Folder folder = folderRepository.findById(folderId)
+                .orElseThrow(NotFoundFolderException::new);
+
+        List<Keyword> keywords = keywordRepository.findByFolder_FolderId(folderId);
+
+        return keywords.stream()
+                .map(keyword -> new ExtractKeywordRes(
+                        folder.getFolderId(),
+                        keyword.getKeywordId(),
+                        keyword.getKeywordName(),
+                        keyword.getKeywordCount()
+                ))
+                .toList();
+    }
+
+    private Map<String, Long> extractKeywordsFromGPT(String chatContent) {
     List<Map<String, String>> messages = new ArrayList<>();
     messages.add(Map.of(
         "role", "user",

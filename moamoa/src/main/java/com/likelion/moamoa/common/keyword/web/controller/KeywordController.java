@@ -8,15 +8,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/keyword")
+@RequestMapping("/keywords")
 @RequiredArgsConstructor
 
 public class KeywordController {
@@ -27,6 +24,15 @@ public class KeywordController {
     public ResponseEntity<SuccessResponse<?>> extractKeyword(
             @RequestBody @Valid ExtractKeywordReq extractKeywordReq) {
         List<ExtractKeywordRes> keywords = keywordService.extractKeyword(extractKeywordReq);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(SuccessResponse.ok(keywords));
+    }
+    @GetMapping("/folder/{folderId}")
+    public ResponseEntity<SuccessResponse<?>> getKeywords(@PathVariable Long folderId){
+
+        List<ExtractKeywordRes> keywords = keywordService.getKeywords(folderId);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
