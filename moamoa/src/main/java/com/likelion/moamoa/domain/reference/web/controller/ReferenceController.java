@@ -1,10 +1,7 @@
 package com.likelion.moamoa.domain.reference.web.controller;
 
 import com.likelion.moamoa.domain.reference.service.ReferenceService;
-import com.likelion.moamoa.domain.reference.web.dto.ReferenceDetailRes;
-import com.likelion.moamoa.domain.reference.web.dto.ReferenceSummaryRes;
-import com.likelion.moamoa.domain.reference.web.dto.SaveReferenceReq;
-import com.likelion.moamoa.domain.reference.web.dto.SaveReferenceRes;
+import com.likelion.moamoa.domain.reference.web.dto.*;
 import com.likelion.moamoa.global.response.SuccessResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +52,20 @@ public class ReferenceController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(SuccessResponse.ok(referenceDetailRes));
+    }
+
+    // 래퍼런스 수정(이름, 설명)
+    @PutMapping("/{referenceId}")
+    public ResponseEntity<SuccessResponse<?>> modifyReference(
+            @PathVariable Long folderId,
+            @PathVariable Long referenceId,
+            @RequestBody ModifyReferenceReq modifyReferenceReq
+    ) {
+        ModifyReferenceRes modifyReferenceRes = referenceService.modify(folderId, referenceId, modifyReferenceReq);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(SuccessResponse.ok(modifyReferenceRes));
     }
 
     // 래퍼런스 삭제
