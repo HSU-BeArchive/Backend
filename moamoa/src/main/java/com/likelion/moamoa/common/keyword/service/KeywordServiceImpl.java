@@ -97,6 +97,12 @@ public List<ExtractKeywordRes> extractKeyword(ExtractKeywordReq extractKeywordRe
 
         List<Keyword> keywords = keywordRepository.findByFolder_FolderId(folderId);
 
+        List<Keyword> existingKeywords = keywordRepository.findByFolder_FolderId(folderId);
+        keywordRepository.deleteAll(existingKeywords);
+
+        List<ExtractKeywordRes> results = new ArrayList<>();
+
+
         return keywords.stream()
                 .map(keyword -> new ExtractKeywordRes(
                         folder.getFolderId(),
