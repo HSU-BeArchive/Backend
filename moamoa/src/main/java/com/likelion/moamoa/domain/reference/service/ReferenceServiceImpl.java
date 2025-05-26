@@ -7,11 +7,8 @@ import com.likelion.moamoa.domain.reference.entity.Reference;
 import com.likelion.moamoa.domain.reference.exception.DuplicateImgNameException;
 import com.likelion.moamoa.domain.reference.exception.NotFoundReferenceException;
 import com.likelion.moamoa.domain.reference.repository.ReferenceRepository;
-import com.likelion.moamoa.domain.reference.web.dto.ReferenceDetailRes;
-import com.likelion.moamoa.domain.reference.web.dto.ReferenceSummaryRes;
+import com.likelion.moamoa.domain.reference.web.dto.*;
 import com.likelion.moamoa.domain.reference.web.dto.ReferenceSummaryRes.ReferenceSummary;
-import com.likelion.moamoa.domain.reference.web.dto.SaveReferenceReq;
-import com.likelion.moamoa.domain.reference.web.dto.SaveReferenceRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -108,6 +105,39 @@ public class ReferenceServiceImpl implements ReferenceService {
                 reference.getImgUrl(),
                 reference.getReferenceOrder(),
                 reference.getReferenceOrder()
+        );
+    }
+
+    // 래퍼런스 수정
+    @Transactional
+    @Override
+    public ModifyReferenceRes modify(Long folderId, Long referenceId, ModifyReferenceReq modifyReferenceReq) {
+        Reference reference = referenceRepository.findById(referenceId)
+                .orElseThrow(NotFoundReferenceException::new);
+
+        if (!reference.getFolder().getFolderId().equals(folderId)) {
+            throw new NotFoundFolderException();
+        }
+
+        String nameBefore = reference.getName();
+        String descriptionBefore = reference.getDescription();
+
+        String nameAfter = modifyReferenceReq.getReferenceName();
+        String descriptionAfter = modifyReferenceReq.getReferenceDescription();
+
+        if (nameAfter != null) {
+            reference.setName(nameAfter);
+        }
+        if (descriptionAfter != null) {
+            reference.setDescription(descriptionAfter);
+        }
+
+        return new ModifyReferenceRes(
+                reference.getReferenceId(),
+                nameBefore,
+                reference.getName(),
+                descriptionBefore,
+                reference.getDescription()
         );
     }
 
