@@ -1,0 +1,174 @@
+package com.likelion.moamoa.common.keyword.service;
+
+import com.likelion.moamoa.common.chat.entitiy.Chat;
+import com.likelion.moamoa.common.chat.repository.ChatRepository;
+import com.likelion.moamoa.common.config.OpenAiConfig;
+import com.likelion.moamoa.common.keyword.entity.Keyword;
+import com.likelion.moamoa.common.keyword.repository.KeywordRepository;
+import com.likelion.moamoa.common.keyword.web.dto.ExtractKeywordReq;
+import com.likelion.moamoa.common.keyword.web.dto.ExtractKeywordRes;
+import com.likelion.moamoa.common.question.entity.Recommendation;
+import com.likelion.moamoa.common.question.repository.RecommendationRepository;
+import com.likelion.moamoa.domain.folder.entity.Folder;
+import com.likelion.moamoa.domain.folder.repository.FolderRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class KeywordServiceImpl implements KeywordService {
+
+    private final FolderRepository folderRepository;
+    private final RecommendationRepository recommendationRepository;
+    private final ChatRepository chatRepository;
+    private final KeywordRepository keywordRepository;
+    private final OpenAiConfig openAiConfig;
+    private final RestTemplate restTemplate;
+
+    @Override
+    public List<ExtractKeywordRes> extractKeywords(ExtractKeywordReq extractKeywordReq) {
+
+        // 1. 폴더 존재 확인
+        Folder folder = folderRepository.findById(extractKeywordReq.getFolderId())
+                .orElseThrow(() -> new RuntimeException("폴더를 찾을 수 없습니다."));
+
+        // 2. 해당 폴더의 모든 추천 질문(레퍼런스) 가져오기
+        List<Recommendation> recommendations = recommendationRepository.findByFolder_FolderId(extractKeywordReq.getFolderId());
+
+        if (recommendations.isEmpty()) {
+            throw new RuntimeException("해당 폴더에 레퍼런스가 없습니다.");
+        }
+
+        // 3. 모든 레퍼런스의 대화 내용 수집
+        StringBuilder allChatContent = new StringBuilder();
+
+        for (Recommendation recommendation : recommendations) {
+            // 각 레퍼런스의 모든 채팅 내용 가져오기
+            List<Chat> chats = chatRepository.findByRecommendation_RecommendationIdOrderByCreatedAtAsc(
+                    recommendation.getRecommendationId());
+
+            // 채팅 내용들을 하나의 텍스트로 합치기
+            for (Chat chat : chats) {
+                allChatContent.append(chat.getContent()).append(" ");
+            }
+        }
+
+        // 4. 대화 내용이 없으면 빈 리스트 반환
+        if (allChatContent.length() == 0) {
+            return new ArrayList<>();
+        }
+
+        // 5. GPT API를 통해 키워드 추출
+        Map<String, Long> keywordCounts = extractKeywordsFromGPT(allChatContent.toString());
+
+        // 6. 기존 키워드 삭제 (새로운 분석 결과로 업데이트)
+        List<Keyword> existingKeywords = keywordRepository.findByFolder_FolderId(extractKeywordReq.getFolderId());
+        keywordRepository.deleteAll(existingKeywords);
+
+        // 7. 새로운 키워드들을 데이터베이스에 저장
+        List<ExtractKeywordRes> results = new ArrayList<>();
+
+        for (Map.Entry<String, Long> entry : keywordCounts.entrySet()) {
+            // 키워드 엔티티 생성
+            Keyword keyword = new Keyword();
+            keyword.setKeywordName(entry.getKey());
+            keyword.setKeywordCount(entry.getValue());
+            keyword.setFolder(folder);
+
+            // 데이터베이스에 저장
+            Keyword savedKeyword = keywordRepository.save(keyword);
+
+            // 응답 DTO 생성
+            ExtractKeywordRes keywordRes = new ExtractKeywordRes(
+                    folder.getFolderId(),
+                    savedKeyword.getKeywordId(),
+                    savedKeyword.getKeywordName(),
+                    savedKeyword.getKeywordCount()
+            );
+            results.add(keywordRes);
+        }
+
+        // 8. 키워드 빈도순으로 정렬해서 반환
+        return results.stream()
+                .sorted((a, b) -> Long.compare(b.keywordCount(), a.keywordCount()))
+                .collect(Collectors.toList());
+    }
+
+    // 간단한 키워드 추출 메서드 (GPT API 사용)
+    private Map<String, Long> extractKeywordsFromGPT(String chatContent) {
+
+        // GPT에게 보낼 메시지 간단하게 구성
+        List<Map<String, String>> messages = new ArrayList<>();
+        messages.add(Map.of("role", "user",
+                "content", "다음 텍스트에서 중요한 키워드 5개를 뽑고 각각 몇 번 나왔는지 세어서 " +
+                          "'키워드:횟수,키워드:횟수' 형식으로만 답해줘. 예: 인공지능:3,데이터:2\n\n" + chatContent));
+
+        // API 요청 보내기
+        Map<String, Object> body = new HashMap<>();
+        body.put("model", openAiConfig.getModel());
+        body.put("messages", messages);
+        body.put("max_tokens", 200);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(openAiConfig.getApiKey());
+
+        try {
+            // GPT API 호출 (기존 채팅 코드와 똑같은 방식)
+            ResponseEntity<Map> response = restTemplate.postForEntity(
+                    openAiConfig.getApiUrl(),
+                    new HttpEntity<>(body, headers),
+                    Map.class
+            );
+
+            // 응답에서 내용 뽑기 (기존 채팅 코드 복사)
+            Map<String, Object> responseBody = response.getBody();
+            if (responseBody != null && responseBody.containsKey("choices")) {
+                List<Map<String, Object>> choices = (List<Map<String, Object>>) responseBody.get("choices");
+                if (!choices.isEmpty()) {
+                    Map<String, Object> firstChoice = choices.get(0);
+                    if (firstChoice.containsKey("message")) {
+                        Map<String, String> message = (Map<String, String>) firstChoice.get("message");
+                        if (message.containsKey("content")) {
+                            String gptAnswer = message.get("content").trim();
+
+                            // 간단한 파싱: "키워드:횟수,키워드:횟수" → Map으로 변환
+                            Map<String, Long> result = new HashMap<>();
+                            String[] pairs = gptAnswer.split(",");
+
+                            for (String pair : pairs) {
+                                if (pair.contains(":")) {
+                                    String[] parts = pair.trim().split(":");
+                                    if (parts.length == 2) {
+                                        try {
+                                            result.put(parts[0].trim(), Long.parseLong(parts[1].trim()));
+                                        } catch (Exception ignored) {
+                                            // 파싱 실패하면 무시
+                                        }
+                                    }
+                                }
+                            }
+                            return result;
+                        }
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // 실패시 기본값 반환
+        Map<String, Long> defaultResult = new HashMap<>();
+        defaultResult.put("키워드추출실패", 1L);
+        return defaultResult;
+    }
+}
