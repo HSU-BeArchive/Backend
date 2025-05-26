@@ -2,6 +2,7 @@ package com.likelion.moamoa.common.question.entity;
 
 import com.likelion.moamoa.common.chat.entitiy.Chat;
 import com.likelion.moamoa.domain.auth.entity.User;
+import com.likelion.moamoa.domain.folder.entity.Folder;
 import com.likelion.moamoa.domain.reference.entity.Reference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -29,5 +30,9 @@ public class Recommendation {
 
     @OneToMany(mappedBy = "recommendation", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Chat> chatList = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "FOLDER_ID")
+    private Folder folder;
 
 }

@@ -43,6 +43,7 @@ public class RecommendationServiceImpl implements RecommendationService {
                 .builder()
                 .question(question)
                 .reference(reference)
+                .folder(folder)
                 .build();
 
         Recommendation saved = recommendationRepository.save(recommendation);
