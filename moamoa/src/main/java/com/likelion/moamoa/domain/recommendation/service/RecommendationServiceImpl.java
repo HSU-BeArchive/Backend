@@ -1,5 +1,6 @@
 package com.likelion.moamoa.domain.recommendation.service;
 
+import com.likelion.moamoa.domain.chat.exception.NotFoundRecommendationException;
 import com.likelion.moamoa.domain.recommendation.entity.Recommendation;
 import com.likelion.moamoa.domain.recommendation.exception.DuplicateRecommendationException;
 import com.likelion.moamoa.domain.recommendation.exception.NotFoundReferenceException;
@@ -64,6 +65,10 @@ public class RecommendationServiceImpl implements RecommendationService {
                 .orElseThrow(NotFoundReferenceException::new);
 
         Recommendation recommendation = recommendationRepository.findByReference_ReferenceId(referenceId);
+
+        if (recommendation == null) {
+            throw new NotFoundRecommendationException();
+        }
 
 
         return new RecommendationDetailRes(
