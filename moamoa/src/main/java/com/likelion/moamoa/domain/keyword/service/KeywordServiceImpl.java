@@ -116,7 +116,7 @@ public ExtractKeywordRes extractKeyword(ExtractKeywordReq extractKeywordReq) {
     List<Map<String, String>> messages = new ArrayList<>();
     messages.add(Map.of(
         "role", "user",
-        "content", "다음 텍스트에서 중요한 키워드 5개를 뽑고 각각 몇 번 나왔는지 세어서 " +
+        "content", "다음 텍스트에서 중요한 키워드 10개를 뽑고 각각 몇 번 나왔는지 세어서 " +
                   "'키워드:횟수,키워드:횟수' 형식으로만 답해줘. 예: 인공지능:3,데이터:2\n\n" + chatContent
     ));
 
