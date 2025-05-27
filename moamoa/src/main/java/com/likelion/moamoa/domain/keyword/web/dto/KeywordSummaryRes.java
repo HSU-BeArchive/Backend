@@ -2,14 +2,13 @@ package com.likelion.moamoa.domain.keyword.web.dto;
 
 import java.util.List;
 
-public record ExtractKeywordRes(
+public record KeywordSummaryRes(
         Long folderId,
-        List<ExtractKeyword> keywordList
+        List<KeywordSummary> keywordList
 ) {
-    public record ExtractKeyword(
+    public record KeywordSummary(
             Long keywordId,
             String keywordName,
-            Long keywordCount){
+            Long keywordCount) {
 
-    }
-}
+    }}

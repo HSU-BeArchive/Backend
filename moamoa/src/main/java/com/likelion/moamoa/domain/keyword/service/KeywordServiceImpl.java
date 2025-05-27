@@ -4,6 +4,7 @@ package com.likelion.moamoa.domain.keyword.service;
 import com.likelion.moamoa.domain.chat.entitiy.Chat;
 import com.likelion.moamoa.domain.chat.exception.NotFoundRecommendationException;
 import com.likelion.moamoa.domain.chat.repository.ChatRepository;
+import com.likelion.moamoa.domain.keyword.web.dto.KeywordSummaryRes;
 import com.likelion.moamoa.global.config.OpenAiConfig;
 import com.likelion.moamoa.domain.keyword.entity.Keyword;
 import com.likelion.moamoa.domain.keyword.repository.KeywordRepository;
@@ -43,10 +44,13 @@ public class KeywordServiceImpl implements KeywordService {
     private final OpenAiConfig openAiConfig;
 
 @Override
-public List<ExtractKeywordRes> extractKeyword(ExtractKeywordReq extractKeywordReq) {
+public ExtractKeywordRes extractKeyword(ExtractKeywordReq extractKeywordReq) {
     // 폴더 확인
     Folder folder = folderRepository.findById(extractKeywordReq.getFolderId())
             .orElseThrow(NotFoundFolderException::new);
+
+    List<Keyword> existingKeywords = keywordRepository.findByFolder_FolderId(extractKeywordReq.getFolderId());
+    keywordRepository.deleteAll(existingKeywords);
 
     // 추천질문 가져오기
     List<Recommendation> recommendations = recommendationRepository
@@ -80,37 +84,31 @@ public List<ExtractKeywordRes> extractKeyword(ExtractKeywordReq extractKeywordRe
         savedKeywords.add(keywordRepository.save(keyword));
     }
 
-    return savedKeywords.stream()
-            .map(keyword -> new ExtractKeywordRes(
-                    folder.getFolderId(),
+    List<ExtractKeywordRes.ExtractKeyword> keywordList = savedKeywords.stream()
+            .map(keyword -> new ExtractKeywordRes.ExtractKeyword(
                     keyword.getKeywordId(),
                     keyword.getKeywordName(),
                     keyword.getKeywordCount()
-            ))
-            .toList();
+            )).toList();
+
+    return new ExtractKeywordRes(folder.getFolderId(), keywordList);
 }
 
     @Override
-    public List<ExtractKeywordRes> getKeywords(Long folderId) {
+    public KeywordSummaryRes getKeywords(Long folderId) {
         Folder folder = folderRepository.findById(folderId)
                 .orElseThrow(NotFoundFolderException::new);
 
         List<Keyword> keywords = keywordRepository.findByFolder_FolderId(folderId);
 
-        List<Keyword> existingKeywords = keywordRepository.findByFolder_FolderId(folderId);
-        keywordRepository.deleteAll(existingKeywords);
-
-        List<ExtractKeywordRes> results = new ArrayList<>();
-
-
-        return keywords.stream()
-                .map(keyword -> new ExtractKeywordRes(
-                        folder.getFolderId(),
+        List<KeywordSummaryRes.KeywordSummary> keywordList = keywords.stream()
+                .map(keyword -> new KeywordSummaryRes.KeywordSummary(
                         keyword.getKeywordId(),
                         keyword.getKeywordName(),
                         keyword.getKeywordCount()
-                ))
-                .toList();
+                )).toList();
+
+        return new KeywordSummaryRes(folderId, keywordList);
     }
 
     private Map<String, Long> extractKeywordsFromGPT(String chatContent) {
