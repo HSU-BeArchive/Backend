@@ -99,7 +99,7 @@ public class FolderServiceImpl implements FolderService {
             throw new DuplicateFolderNameException();
         }
 
-        String folderNameBefore = folder.getFolderName(); // 바뀌기 전 이름
+        String folderNameBefore = folder.getFolderName();
         folder.setFolderName(modifyFolderReq.getFolderName());
 
         return new ModifyFolderRes(

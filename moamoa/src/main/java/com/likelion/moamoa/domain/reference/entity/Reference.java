@@ -1,6 +1,6 @@
 package com.likelion.moamoa.domain.reference.entity;
 
-import com.likelion.moamoa.common.question.entity.Recommendation;
+import com.likelion.moamoa.domain.recommendation.entity.Recommendation;
 import com.likelion.moamoa.domain.folder.entity.Folder;
 import jakarta.persistence.*;
 import lombok.*;
