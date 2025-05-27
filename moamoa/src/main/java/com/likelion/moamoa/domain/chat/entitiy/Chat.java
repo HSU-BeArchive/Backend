@@ -1,6 +1,6 @@
 package com.likelion.moamoa.domain.chat.entitiy;
 
-import com.likelion.moamoa.domain.question.entity.Recommendation;
+import com.likelion.moamoa.domain.recommendation.entity.Recommendation;
 import com.likelion.moamoa.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;

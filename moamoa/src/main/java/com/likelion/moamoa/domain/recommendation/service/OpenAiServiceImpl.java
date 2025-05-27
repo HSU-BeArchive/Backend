@@ -1,4 +1,4 @@
-package com.likelion.moamoa.domain.question.service;
+package com.likelion.moamoa.domain.recommendation.service;
 
 import com.likelion.moamoa.global.config.OpenAiConfig;
 import lombok.RequiredArgsConstructor;

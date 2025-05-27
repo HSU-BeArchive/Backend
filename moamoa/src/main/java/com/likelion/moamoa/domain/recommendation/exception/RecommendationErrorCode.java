@@ -1,4 +1,4 @@
-package com.likelion.moamoa.domain.question.exception;
+package com.likelion.moamoa.domain.recommendation.exception;
 
 import com.likelion.moamoa.global.response.code.BaseResponseCode;
 import lombok.AllArgsConstructor;

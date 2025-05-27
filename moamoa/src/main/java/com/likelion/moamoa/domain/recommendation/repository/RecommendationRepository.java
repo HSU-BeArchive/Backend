@@ -1,6 +1,6 @@
-package com.likelion.moamoa.domain.question.repository;
+package com.likelion.moamoa.domain.recommendation.repository;
 
-import com.likelion.moamoa.domain.question.entity.Recommendation;
+import com.likelion.moamoa.domain.recommendation.entity.Recommendation;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -10,4 +10,6 @@ public interface RecommendationRepository extends JpaRepository<Recommendation,L
     boolean existsByReference_ReferenceId(Long referenceId);
 
     List<Recommendation> findAllByFolder_FolderId(Long folderId);
+
+    Recommendation findByReference_ReferenceId(Long referenceId);
 }

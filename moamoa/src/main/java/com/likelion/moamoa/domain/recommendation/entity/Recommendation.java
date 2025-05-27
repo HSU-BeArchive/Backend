@@ -1,4 +1,4 @@
-package com.likelion.moamoa.domain.question.entity;
+package com.likelion.moamoa.domain.recommendation.entity;
 
 import com.likelion.moamoa.domain.chat.entitiy.Chat;
 import com.likelion.moamoa.domain.folder.entity.Folder;

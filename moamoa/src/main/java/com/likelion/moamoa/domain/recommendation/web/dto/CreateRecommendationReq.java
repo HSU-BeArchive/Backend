@@ -1,13 +1,12 @@
-package com.likelion.moamoa.domain.question.web.dto;
+package com.likelion.moamoa.domain.recommendation.web.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @NoArgsConstructor
-public class CreateQuestionReq {
+public class CreateRecommendationReq {
     @NotNull
     private Long referenceId;
 }
