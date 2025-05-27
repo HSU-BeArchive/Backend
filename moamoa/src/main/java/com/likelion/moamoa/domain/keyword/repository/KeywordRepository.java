@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface KeywordRepository extends JpaRepository<Keyword ,Long> {
-    //특정 폴더에 해당하는 엔티티들을 keywordCount 기준으로 내림차순으로 정렬
+    // folderId로 찾은 키워드 List로 저장
     List<Keyword> findByFolder_FolderId(Long folderId);
 }

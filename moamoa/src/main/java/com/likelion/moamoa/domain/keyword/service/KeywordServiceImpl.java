@@ -49,9 +49,6 @@ public ExtractKeywordRes extractKeyword(ExtractKeywordReq extractKeywordReq) {
     Folder folder = folderRepository.findById(extractKeywordReq.getFolderId())
             .orElseThrow(NotFoundFolderException::new);
 
-    List<Keyword> existingKeywords = keywordRepository.findByFolder_FolderId(extractKeywordReq.getFolderId());
-    keywordRepository.deleteAll(existingKeywords);
-
     // 추천질문 가져오기
     List<Recommendation> recommendations = recommendationRepository
             .findAllByFolder_FolderId(extractKeywordReq.getFolderId());
@@ -59,6 +56,10 @@ public ExtractKeywordRes extractKeyword(ExtractKeywordReq extractKeywordReq) {
     if (recommendations.isEmpty()) {
         throw new NotFoundRecommendationException();
     }
+
+    // 키워드가 이미 존재하면 삭제
+    List<Keyword> existingKeywords = keywordRepository.findByFolder_FolderId(extractKeywordReq.getFolderId());
+    keywordRepository.deleteAll(existingKeywords);
 
     // 모든 채팅 내용 수집
     StringBuilder allChatContent = new StringBuilder();
