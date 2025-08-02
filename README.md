@@ -14,8 +14,8 @@ BeArchive는 GPT API를 활용하여 이미지 기반 추천 질문을 제공하
 
 ## 🛠 기술 스택
 
-- **Language**: Java 17  
-- **Framework**: Spring Boot 3.x  
+- **Language**: Java 21  
+- **Framework**: Spring Boot 3.3.1  
 - **Build Tool**: Gradle  
 - **Database**: MySQL  
 - **ORM**: Spring Data JPA  
