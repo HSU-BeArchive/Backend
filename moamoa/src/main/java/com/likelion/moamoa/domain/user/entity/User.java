@@ -1,7 +1,10 @@
-package com.likelion.moamoa.domain.auth.entity;
+package com.likelion.moamoa.domain.user.entity;
 
+import com.likelion.moamoa.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.io.Serializable;
 
 @Entity
 @Getter
@@ -10,14 +13,14 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "users")
-public class User {
+public class User extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "USER_ID")
-    private Long userId;
+    private Long id;
 
-    @Column(name = "LOGIN_ID")
-    private String loginId;
+    @Column(name = "EMAIL")
+    private String email;
 
     @Column(name = "PASSWORD")
     private String password;
