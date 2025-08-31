@@ -1,12 +1,12 @@
 package com.likelion.moamoa.domain.folder.service;
 
-import com.likelion.moamoa.domain.auth.entity.User;
-import com.likelion.moamoa.domain.auth.repository.UserRepository;
+import com.likelion.moamoa.domain.user.entity.User;
+import com.likelion.moamoa.domain.user.repository.UserRepository;
 import com.likelion.moamoa.domain.folder.entity.Folder;
-import com.likelion.moamoa.domain.folder.exception.DuplicateFolderNameException;
-import com.likelion.moamoa.domain.folder.exception.InvalidFolderOrderException;
-import com.likelion.moamoa.domain.folder.exception.NotFoundFolderException;
-import com.likelion.moamoa.domain.folder.exception.NotFoundUserException;
+import com.likelion.moamoa.global.response.code.folder.DuplicateFolderNameException;
+import com.likelion.moamoa.global.response.code.folder.InvalidFolderOrderException;
+import com.likelion.moamoa.global.response.code.folder.NotFoundFolderException;
+import com.likelion.moamoa.global.response.code.folder.NotFoundUserException;
 import com.likelion.moamoa.domain.folder.repository.FolderRepository;
 import com.likelion.moamoa.domain.folder.web.dto.*;
 import com.likelion.moamoa.domain.folder.web.dto.FolderSummaryRes.FolderSummary;
@@ -35,13 +35,13 @@ public class FolderServiceImpl implements FolderService {
                 .orElseThrow(NotFoundUserException::new);
 
         // 폴더 중복 예외
-        if(folderRepository.existsByFolderNameAndUser_UserId(createFolderReq.getFolderName(), userId)) {
+        if(folderRepository.existsByFolderNameAndUser_Id(createFolderReq.getFolderName(), userId)) {
             throw new DuplicateFolderNameException();
         }
 
         Folder folder = Folder.builder()
                 .folderName(createFolderReq.getFolderName())
-                .folderOrder(folderRepository.countFolderByUser_UserId(userId)) // 0번부터 시작
+                .folderOrder(folderRepository.countFolderByUser_Id(userId)) // 0번부터 시작
                 .user(user)
                 .build();
 
@@ -50,7 +50,7 @@ public class FolderServiceImpl implements FolderService {
 
         // Folder Entity -> CreateFolderRes로 변환
         return new CreateFolderRes(
-                saveFolder.getUser().getUserId(),
+                saveFolder.getUser().getId(),
                 saveFolder.getFolderId(),
                 saveFolder.getFolderName(),
                 saveFolder.getFolderOrder()
@@ -64,7 +64,7 @@ public class FolderServiceImpl implements FolderService {
         User user = userRepository.findById(userId)
                 .orElseThrow(NotFoundUserException::new);
 
-        List<Folder> folders = folderRepository.findAllByUser_UserId(userId);
+        List<Folder> folders = folderRepository.findAllByUser_Id(userId);
         List<FolderSummary> folderSummaryList = new ArrayList<>();
 
         for (Folder folder : folders) {
@@ -76,7 +76,7 @@ public class FolderServiceImpl implements FolderService {
             folderSummaryList.add(folderSummary);
         }
 
-        return new FolderSummaryRes(user.getUserId(), folderSummaryList);
+        return new FolderSummaryRes(user.getId(), folderSummaryList);
     }
 
     // 폴더 이름 변경
@@ -90,12 +90,12 @@ public class FolderServiceImpl implements FolderService {
         Folder folder = folderRepository.findById(folderId)
                 .orElseThrow(NotFoundFolderException::new);
 
-        if (!folder.getUser().getUserId().equals(userId)) {
+        if (!folder.getUser().getId().equals(userId)) {
             throw new NotFoundUserException();
         }
 
         // 폴더 이름 중복 예외
-        if(folderRepository.existsByFolderNameAndUser_UserId(modifyFolderReq.getFolderName(), userId)) {
+        if(folderRepository.existsByFolderNameAndUser_Id(modifyFolderReq.getFolderName(), userId)) {
             throw new DuplicateFolderNameException();
         }
 
@@ -103,7 +103,7 @@ public class FolderServiceImpl implements FolderService {
         folder.setFolderName(modifyFolderReq.getFolderName());
 
         return new ModifyFolderRes(
-                folder.getUser().getUserId(),
+                folder.getUser().getId(),
                 folder.getFolderId(),
                 folderNameBefore,
                 folder.getFolderName()
@@ -117,13 +117,13 @@ public class FolderServiceImpl implements FolderService {
         Folder folder = folderRepository.findById(folderId)
                 .orElseThrow(NotFoundFolderException::new);
 
-        if (!folder.getUser().getUserId().equals(userId)) {
+        if (!folder.getUser().getId().equals(userId)) {
             throw new NotFoundUserException();
         }
 
         // 폴더 삭제하면 모두 앞당기기
         Long orderValue = folder.getFolderOrder();
-        folderRepository.findAllByUser_UserId(userId).stream()
+        folderRepository.findAllByUser_Id(userId).stream()
                 .filter(f -> f.getFolderOrder() > orderValue)
                 .forEach(f -> f.setFolderOrder(f.getFolderOrder() - 1));
 
@@ -142,23 +142,23 @@ public class FolderServiceImpl implements FolderService {
         Folder folder = folderRepository.findById(folderId)
                 .orElseThrow(NotFoundFolderException::new);
 
-        if (!folder.getUser().getUserId().equals(userId)) {
+        if (!folder.getUser().getId().equals(userId)) {
             throw new NotFoundUserException();
         }
 
         Long orderBefore = folder.getFolderOrder();
         Long orderAfter = changeFolderReq.getFolderOrderAfter();
 
-        if (orderAfter < 0 || orderAfter >= folderRepository.countFolderByUser_UserId(userId)) {
+        if (orderAfter < 0 || orderAfter >= folderRepository.countFolderByUser_Id(userId)) {
             throw new InvalidFolderOrderException();
         }
 
         if (orderBefore < orderAfter) {
-            folderRepository.findAllByUser_UserId(userId).stream()
+            folderRepository.findAllByUser_Id(userId).stream()
                     .filter(f -> f.getFolderOrder() > orderBefore && f.getFolderOrder() <= orderAfter)
                     .forEach(f -> f.setFolderOrder(f.getFolderOrder() - 1));
         } else {
-            folderRepository.findAllByUser_UserId(userId).stream()
+            folderRepository.findAllByUser_Id(userId).stream()
                     .filter(f -> f.getFolderOrder() >= orderAfter && f.getFolderOrder() < orderBefore)
                     .forEach(f -> f.setFolderOrder(f.getFolderOrder() + 1));
         }
@@ -166,7 +166,7 @@ public class FolderServiceImpl implements FolderService {
         folder.setFolderOrder(orderAfter);
 
         return new ChangeFolderRes(
-                folder.getUser().getUserId(),
+                folder.getUser().getId(),
                 folder.getFolderId(),
                 orderBefore,
                 folder.getFolderOrder()
