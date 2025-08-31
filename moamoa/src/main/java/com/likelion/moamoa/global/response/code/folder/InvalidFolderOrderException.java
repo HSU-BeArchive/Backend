@@ -1,4 +1,4 @@
-package com.likelion.moamoa.domain.folder.exception;
+package com.likelion.moamoa.global.response.code.folder;
 
 import com.likelion.moamoa.global.exception.BaseException;
 

@@ -1,11 +1,11 @@
 package com.likelion.moamoa.domain.reference.service;
 
 import com.likelion.moamoa.domain.folder.entity.Folder;
-import com.likelion.moamoa.domain.folder.exception.NotFoundFolderException;
+import com.likelion.moamoa.global.response.code.folder.NotFoundFolderException;
 import com.likelion.moamoa.domain.folder.repository.FolderRepository;
 import com.likelion.moamoa.domain.reference.entity.Reference;
-import com.likelion.moamoa.domain.reference.exception.DuplicateImgNameException;
-import com.likelion.moamoa.domain.reference.exception.NotFoundReferenceException;
+import com.likelion.moamoa.global.response.code.reference.DuplicateImgNameException;
+import com.likelion.moamoa.global.response.code.reference.NotFoundReferenceException;
 import com.likelion.moamoa.domain.reference.repository.ReferenceRepository;
 import com.likelion.moamoa.domain.reference.web.dto.*;
 import com.likelion.moamoa.domain.reference.web.dto.ReferenceSummaryRes.ReferenceSummary;

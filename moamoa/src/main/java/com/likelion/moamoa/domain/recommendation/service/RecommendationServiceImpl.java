@@ -6,7 +6,7 @@ import com.likelion.moamoa.domain.recommendation.exception.DuplicateRecommendati
 import com.likelion.moamoa.domain.recommendation.exception.NotFoundReferenceException;
 import com.likelion.moamoa.domain.recommendation.repository.RecommendationRepository;
 import com.likelion.moamoa.domain.recommendation.web.dto.CreateRecommendationRes;
-import com.likelion.moamoa.domain.auth.entity.User;
+import com.likelion.moamoa.domain.user.entity.User;
 import com.likelion.moamoa.domain.folder.entity.Folder;
 import com.likelion.moamoa.domain.recommendation.web.dto.RecommendationDetailRes;
 import com.likelion.moamoa.domain.reference.entity.Reference;
@@ -53,7 +53,7 @@ public class RecommendationServiceImpl implements RecommendationService {
         return new CreateRecommendationRes(
                 saved.getRecommendationId(),
                 saved.getQuestion(),
-                saved.getReference().getFolder().getUser().getUserId(),
+                saved.getReference().getFolder().getUser().getId(),
                 saved.getReference().getFolder().getFolderId(),
                 saved.getReference().getReferenceId()
         );
@@ -74,7 +74,7 @@ public class RecommendationServiceImpl implements RecommendationService {
         return new RecommendationDetailRes(
                 recommendation.getRecommendationId(),
                 recommendation.getQuestion(),
-                recommendation.getReference().getFolder().getUser().getUserId(),
+                recommendation.getReference().getFolder().getUser().getId(),
                 recommendation.getReference().getFolder().getFolderId(),
                 recommendation.getReference().getReferenceId()
         );

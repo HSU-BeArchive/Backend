@@ -1,4 +1,4 @@
-package com.likelion.moamoa.domain.reference.exception;
+package com.likelion.moamoa.global.response.code.reference;
 
 import com.likelion.moamoa.global.exception.BaseException;
 
