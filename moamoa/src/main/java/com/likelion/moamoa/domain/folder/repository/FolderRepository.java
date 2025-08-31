@@ -9,9 +9,9 @@ import java.util.List;
 @Repository
 public interface FolderRepository extends JpaRepository<Folder, Long> {
     // 폴더 이름 중복
-    boolean existsByFolderNameAndUser_UserId(String folderName, Long userUserId);
+    boolean existsByFolderNameAndUser_Id(String folderName, Long userUserId);
     // userId로 폴더 조회
-    List<Folder> findAllByUser_UserId(Long userId);
+    List<Folder> findAllByUser_Id(Long userId);
     // userId에 몇개의 폴더가 있는지 확인
-    Long countFolderByUser_UserId(Long userId);
+    Long countFolderByUser_Id(Long userId);
 }

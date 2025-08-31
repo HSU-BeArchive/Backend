@@ -15,7 +15,7 @@ import com.likelion.moamoa.domain.recommendation.repository.RecommendationReposi
 import com.likelion.moamoa.domain.recommendation.service.OpenAiService;
 import com.likelion.moamoa.domain.folder.entity.Folder;
 import com.likelion.moamoa.domain.folder.repository.FolderRepository;
-import com.likelion.moamoa.domain.folder.exception.NotFoundFolderException;
+import com.likelion.moamoa.global.response.code.folder.NotFoundFolderException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;

@@ -3,7 +3,7 @@ package com.likelion.moamoa.domain.folder.entity;
 import com.likelion.moamoa.domain.reference.entity.Reference;
 import jakarta.persistence.*;
 import lombok.*;
-import com.likelion.moamoa.domain.auth.entity.User;
+import com.likelion.moamoa.domain.user.entity.User;
 
 import java.util.ArrayList;
 import java.util.List;

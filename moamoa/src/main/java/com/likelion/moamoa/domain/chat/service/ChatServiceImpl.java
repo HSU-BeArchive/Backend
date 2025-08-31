@@ -7,12 +7,13 @@ import com.likelion.moamoa.domain.chat.exception.NotFoundRecommendationException
 import com.likelion.moamoa.domain.chat.repository.ChatRepository;
 import com.likelion.moamoa.domain.chat.web.dto.ChatMessageReq;
 import com.likelion.moamoa.domain.chat.web.dto.ChatMessageRes;
+import com.likelion.moamoa.domain.reference.repository.ReferenceRepository;
 import com.likelion.moamoa.global.config.OpenAiConfig;
 import com.likelion.moamoa.domain.recommendation.entity.Recommendation;
 import com.likelion.moamoa.domain.recommendation.repository.RecommendationRepository;
-import com.likelion.moamoa.domain.auth.entity.User;
-import com.likelion.moamoa.domain.auth.exception.NotFoundLoginIdException;
-import com.likelion.moamoa.domain.auth.repository.UserRepository;
+import com.likelion.moamoa.domain.user.entity.User;
+import com.likelion.moamoa.global.response.code.user.NotFoundEmailException;
+import com.likelion.moamoa.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -33,6 +34,7 @@ public class ChatServiceImpl implements ChatService {
     private final ChatRepository chatRepository;
     private final OpenAiConfig openAiConfig; // OpenAiConfig 주입
     private final RestTemplate restTemplate; // RestTemplate 주입
+    private final ReferenceRepository referenceRepository;
 
     // 메시지 전송 메서드
     @Override
@@ -40,7 +42,7 @@ public class ChatServiceImpl implements ChatService {
 
         // 사용자 검증 (findById는 기본키를 검증)
         User user = userRepository.findById(chatMessageReq.getUserId())
-                .orElseThrow(NotFoundLoginIdException::new);
+                .orElseThrow(NotFoundEmailException::new);
 
         // 추천 질문 검증
         Recommendation recommendation = recommendationRepository.findById(chatMessageReq.getRecommendationId())
@@ -162,8 +164,8 @@ public class ChatServiceImpl implements ChatService {
             throw new RuntimeException("GPT-4 API 호출 실패: " + e.getMessage());
         }
     }
-  
-    @Override     
+
+    @Override
     public List<ChatMessageRes> getChatHistory(Long recommendation) {
         List<Chat> chatLogs = chatRepository.findByRecommendation_RecommendationIdOrderByCreatedAtAsc(recommendation);
 
