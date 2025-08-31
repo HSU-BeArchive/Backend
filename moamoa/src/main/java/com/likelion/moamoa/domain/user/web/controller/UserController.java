@@ -1,7 +1,7 @@
-package com.likelion.moamoa.domain.auth.web.controller;
+package com.likelion.moamoa.domain.user.web.controller;
 
-import com.likelion.moamoa.domain.auth.service.UserService;
-import com.likelion.moamoa.domain.auth.web.dto.*;
+import com.likelion.moamoa.domain.user.service.UserService;
+import com.likelion.moamoa.domain.user.web.dto.*;
 import com.likelion.moamoa.global.response.SuccessResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,15 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {
-    // 의존성 부여
+
     private final UserService userService;
 
     // 로그인 아이디 중복 체크 확인
     @PostMapping("check")
     public ResponseEntity<SuccessResponse<?>> check(
-            @RequestBody @Valid loginIdCheckReq loginIdCheckReq
+            @RequestBody @Valid EmailCheckReq emailCheckReq
     ) {
-        userService.loginIdCheck(loginIdCheckReq);
+        userService.checkEmail(emailCheckReq.getEmail());
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -36,10 +36,8 @@ public class UserController {
     public ResponseEntity<SuccessResponse<?>> signup(
             @RequestBody @Valid SignupUserReq signupUserReq
     ) {
-        // 서비스
         SignupUserRes signupUserRes = userService.signup(signupUserReq);
 
-        // 반환
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(SuccessResponse.created(signupUserRes));
@@ -50,10 +48,8 @@ public class UserController {
     public ResponseEntity<SuccessResponse<?>> signin(
             @RequestBody @Valid SigninUserReq signinUserReq
     ) {
-        // 서비스
         SigninUserRes signinUserRes = userService.singin(signinUserReq);
 
-        // 반환
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(SuccessResponse.ok(signinUserRes));
