@@ -48,3 +48,7 @@ application-secret.properties
 
 *.zip
 
+logs
+
+application.properties
+
