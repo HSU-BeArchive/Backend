@@ -27,11 +27,11 @@ public class UserServiceImpl implements UserService {
     // 회원 가입
     @Override
     public SignupUserRes signup(SignupUserReq signupUserReq) {
-//        // 아이디 중복 검사 -> "중복 체크를 따로 뺌"
-//        if (userRepository.existsByLoginId(signupUserReq.getLoginId())) {
-//            // 아이디 중복이 있는 경우 에러 반환
-//            throw new DuplicateLoginIdException();
-//        }
+        // 아이디 중복 검사 -> "중복 체크를 따로 뺌"
+        if (userRepository.existsByLoginId(signupUserReq.getLoginId())) {
+            // 아이디 중복이 있는 경우 에러 반환
+            throw new DuplicateLoginIdException();
+        }
 
         // User 생성
         User user = User.builder()
